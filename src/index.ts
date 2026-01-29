@@ -3,7 +3,16 @@ import { handlePwd, handleLs, handleCd } from './bot/handlers/directory'
 import { config } from './config'
 import { GeminiClient } from './gemini/client'
 import { ToolRegistry } from './gemini/tools'
-import { readFileTool, listDirectoryTool } from './tools/fileOperations'
+import {
+  readFileTool,
+  listDirectoryTool,
+  writeFileTool,
+  appendFileTool,
+  deleteFileTool,
+  createDirectoryTool,
+  moveFileTool,
+  copyFileTool
+} from './tools/fileOperations'
 import { sessionManager } from './bot/middleware/session'
 import { permissionManager } from './permissions/permissionManager'
 
@@ -17,8 +26,18 @@ async function main() {
 
   // Initialize tool registry
   const toolRegistry = new ToolRegistry()
+
+  // Read-only tools
   toolRegistry.registerTool(readFileTool)
   toolRegistry.registerTool(listDirectoryTool)
+
+  // Write tools (require confirmation)
+  toolRegistry.registerTool(writeFileTool)
+  toolRegistry.registerTool(appendFileTool)
+  toolRegistry.registerTool(deleteFileTool)
+  toolRegistry.registerTool(createDirectoryTool)
+  toolRegistry.registerTool(moveFileTool)
+  toolRegistry.registerTool(copyFileTool)
 
   // Initialize Gemini client with tools
   const geminiClient = new GeminiClient(
