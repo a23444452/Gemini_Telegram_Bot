@@ -1,6 +1,18 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
+import { mock } from 'bun:test'
 import { PermissionManager } from '../../src/permissions/permissionManager'
 import type { Bot, Api } from 'grammy'
+
+// Create mock functions compatible with bun:test
+const vi = {
+  fn: mock,
+  clearAllMocks: () => {},
+  useFakeTimers: () => {},
+  useRealTimers: () => {},
+  advanceTimersByTimeAsync: async (ms: number) => {
+    await new Promise(resolve => setTimeout(resolve, ms))
+  }
+}
 
 describe('PermissionManager', () => {
   let permissionManager: PermissionManager
@@ -166,9 +178,8 @@ describe('PermissionManager', () => {
     })
 
     it('should throw error if bot is not set', async () => {
-      const newManager = PermissionManager.getInstance()
-      PermissionManager['instance'] = new PermissionManager()
-      const managerWithoutBot = PermissionManager['instance']
+      // Create a new instance without bot
+      const managerWithoutBot = new (PermissionManager as any)()
 
       await expect(
         managerWithoutBot.requestConfirmation('test', {}, 123)

@@ -5,11 +5,15 @@ import { GeminiClient } from './gemini/client'
 import { ToolRegistry } from './gemini/tools'
 import { readFileTool, listDirectoryTool } from './tools/fileOperations'
 import { sessionManager } from './bot/middleware/session'
+import { permissionManager } from './permissions/permissionManager'
 
 async function main() {
   console.log('🚀 Starting Gemini Telegram Bot...')
 
   const bot = createBot()
+
+  // Set bot instance for permission manager
+  permissionManager.setBot(bot)
 
   // Initialize tool registry
   const toolRegistry = new ToolRegistry()
@@ -63,6 +67,23 @@ async function main() {
   bot.command('pwd', handlePwd)
   bot.command('ls', handleLs)
   bot.command('cd', handleCd)
+
+  // 處理權限確認的 callback query (確認按鈕點擊)
+  bot.on('callback_query:data', async (ctx) => {
+    const data = ctx.callbackQuery.data
+
+    if (data.startsWith('approve:')) {
+      const requestId = data.replace('approve:', '')
+      permissionManager.handleCallback(requestId, true)
+      await ctx.answerCallbackQuery({ text: '✅ 已允許' })
+      await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+    } else if (data.startsWith('reject:')) {
+      const requestId = data.replace('reject:', '')
+      permissionManager.handleCallback(requestId, false)
+      await ctx.answerCallbackQuery({ text: '❌ 已拒絕' })
+      await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+    }
+  })
 
   // 處理一般文字訊息 - 發送給 Gemini
   bot.on('message:text', async (ctx) => {

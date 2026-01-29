@@ -20,14 +20,14 @@ const mockStartChat = mock(() => ({
   getHistory: mockGetHistory
 }))
 
-const mockGetGenerativeModel = mock(() => ({
+const mockGetGenerativeModel = mock((_config?: any) => ({
   startChat: mockStartChat
 }))
 
 mock.module('@google/generative-ai', () => ({
   GoogleGenerativeAI: class {
     constructor(_apiKey?: string) {}
-    getGenerativeModel(config?: any) {
+    getGenerativeModel(config: any) {
       mockGetGenerativeModel(config)
       return {
         startChat: mockStartChat

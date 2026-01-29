@@ -40,8 +40,8 @@ export class GeminiClient {
     let result = await chat.sendMessage(message)
 
     // Handle function calling loop
-    while (result.response.functionCalls && result.response.functionCalls().length > 0) {
-      const functionCalls = result.response.functionCalls()
+    let functionCalls = result.response.functionCalls?.()
+    while (functionCalls && functionCalls.length > 0) {
 
       // Execute all function calls with permission checks
       const functionResponses = await Promise.all(
@@ -91,6 +91,7 @@ export class GeminiClient {
 
       // Send function results back to Gemini
       result = await chat.sendMessage(functionResponses as any)
+      functionCalls = result.response.functionCalls?.()
     }
 
     const responseText = result.response.text()
