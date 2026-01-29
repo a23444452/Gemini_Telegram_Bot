@@ -45,6 +45,9 @@ tmp/
 temp/
 *.tmp
 
+# Process ID files
+*.pid
+
 # Playwright
 test-results/
 playwright-report/
