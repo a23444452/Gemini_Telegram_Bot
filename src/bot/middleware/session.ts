@@ -6,10 +6,18 @@ import { config } from '../../config'
 const USERS_FILE = join(process.cwd(), 'data', 'users.json')
 
 class SessionManager {
+  private static instance: SessionManager
   private sessions: Map<number, UserSession> = new Map()
 
-  constructor() {
+  private constructor() {
     this.loadSessions()
+  }
+
+  static getInstance(): SessionManager {
+    if (!SessionManager.instance) {
+      SessionManager.instance = new SessionManager()
+    }
+    return SessionManager.instance
   }
 
   private loadSessions() {
@@ -66,4 +74,5 @@ class SessionManager {
   }
 }
 
-export const sessionManager = new SessionManager()
+export const sessionManager = SessionManager.getInstance()
+export { SessionManager }

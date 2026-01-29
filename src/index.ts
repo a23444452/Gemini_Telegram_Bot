@@ -1,4 +1,5 @@
 import { createBot } from './bot/bot'
+import { handlePwd, handleLs, handleCd } from './bot/handlers/directory'
 
 async function main() {
   console.log('🚀 Starting Gemini Telegram Bot...')
@@ -30,6 +31,11 @@ async function main() {
     `.trim()
     await ctx.reply(helpText)
   })
+
+  // 工作目錄管理指令
+  bot.command('pwd', handlePwd)
+  bot.command('ls', handleLs)
+  bot.command('cd', handleCd)
 
   // 啟動 bot
   await bot.start()
