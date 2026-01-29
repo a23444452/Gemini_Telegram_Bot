@@ -57,3 +57,13 @@ playwright/.cache/
 mcp-servers/*/data/
 mcp-servers/*/logs/
 output/
+
+# Development process files (internal documentation)
+TASK*.md
+TASKS_*.md
+*_SUMMARY.md
+*_IMPLEMENTATION.md
+*_VALIDATION.md
+OPTIMIZATION.md
+TESTING_*.md
+.project-complete
