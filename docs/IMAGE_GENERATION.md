@@ -2,7 +2,7 @@
 
 ## 概述
 
-Gemini Telegram Bot 現已支援 AI 圖片生成功能，使用 Nano Banana MCP 伺服器連接到 Google 的 Gemini Imagen 模型。
+Gemini Telegram Bot 支援 AI 圖片生成功能，使用 mcp-image MCP 伺服器連接到 Google 的 Gemini 2.5 Flash Image API，可生成 2K 解析度 (2048x2048) 的正方形圖片。
 
 ## 架構
 
@@ -10,13 +10,15 @@ Gemini Telegram Bot 現已支援 AI 圖片生成功能，使用 Nano Banana MCP 
 
 1. **MCP 用戶端** (`src/mcp/client.ts`)
    - 透過 stdio 傳輸連接到 MCP 伺服器
+   - 支援傳遞環境變數（如 GEMINI_API_KEY）
    - 管理工具呼叫和回應
    - 處理連接生命週期
 
 2. **圖片生成工具** (`src/tools/imageGeneration.ts`)
-   - 使用 `executeMCPTool` helper 呼叫 nanobanana
-   - 從 MCP 回應中提取 base64 圖片資料
-   - 執行前需要使用者確認
+   - 使用 `executeMCPTool` helper 呼叫 mcp-image
+   - 從檔案 URI 讀取生成的圖片
+   - 將圖片轉換為 base64 格式
+   - 自動執行，無需使用者確認（避免逾時問題）
 
 3. **Bot 整合** (`src/index.ts`)
    - 註冊圖片生成工具
@@ -30,15 +32,15 @@ Gemini Telegram Bot 現已支援 AI 圖片生成功能，使用 Nano Banana MCP 
   ↓
 Gemini 決定呼叫 generate_image 工具
   ↓
-權限管理器要求確認
+自動執行（無需確認）
   ↓
-使用者同意
+MCP 用戶端連接到 mcp-image (npx -y mcp-image)
   ↓
-MCP 用戶端連接到 nanobanana (npx -y nanobanana)
+mcp-image 呼叫 Gemini 2.5 Flash Image API
   ↓
-nanobanana 呼叫 Gemini Imagen API
+圖片儲存至本地檔案，返回 file:// URI
   ↓
-返回 Base64 圖片
+工具讀取檔案並轉換為 Base64
   ↓
 GeminiClient 在回應中蒐集圖片
   ↓
@@ -49,28 +51,24 @@ Telegram 透過 InputFile 接收圖片
 
 ## 前置條件
 
-### 1. 安裝 Nano Banana
+### 1. Google Gemini API Key
 
-Bot 使用 `npx -y nanobanana` 按需執行伺服器，初次使用時會自動下載。
+圖片生成使用與對話相同的 `GOOGLE_API_KEY`，無需額外設定。
+
+在 `.env` 中設定：
+
+```bash
+GOOGLE_API_KEY=AIzaSyD...your-api-key-here
+```
+
+### 2. mcp-image 套件
+
+Bot 使用 `npx -y mcp-image` 按需執行伺服器，初次使用時會自動下載。
 
 或者，全域安裝：
 
 ```bash
-npm install -g nanobanana
-```
-
-### 2. Google Cloud 配置
-
-Nano Banana 需要具有 Imagen API 存取權的 Google Cloud 認證。設定如下：
-
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"
-```
-
-或設定預設應用程式認證：
-
-```bash
-gcloud auth application-default login
+npm install -g mcp-image
 ```
 
 ## 使用方式
@@ -79,7 +77,9 @@ gcloud auth application-default login
 
 1. **啟動 bot**：
    ```bash
-   npm start
+   ./start.sh
+   # 或
+   bun run src/index.ts
    ```
 
 2. **傳送訊息以生成圖片**：
@@ -91,13 +91,9 @@ gcloud auth application-default login
    Generate a sunset over mountains with vibrant colors
    ```
 
-3. **核准權限要求**：
-   - Bot 會傳送確認訊息，含有「核准」和「拒絕」按鈕
-   - 點擊「核准」以繼續
-
-4. **等待圖片生成**：
-   - Gemini Imagen 通常需要 10-30 秒
-   - Bot 完成時會傳送生成的圖片
+3. **等待圖片生成**：
+   - Gemini 2.5 Flash Image 通常需要 10-30 秒
+   - Bot 完成時會傳送生成的 2K 解析度圖片
 
 ### 範例提示語
 
@@ -113,7 +109,7 @@ gcloud auth application-default login
 ```typescript
 {
   name: 'generate_image',
-  description: 'Generate an image using AI based on a text prompt',
+  description: 'Generate a 2K resolution (2048x2048) square image using AI based on a text prompt',
   parameters: {
     type: 'object',
     properties: {
@@ -124,25 +120,28 @@ gcloud auth application-default login
     },
     required: ['prompt']
   },
-  requiresConfirmation: true  // Always requires user approval
+  requiresConfirmation: false  // 自動執行，避免逾時問題
 }
 ```
 
 ### MCP 伺服器配置
 
 - **伺服器指令**：`npx`
-- **伺服器參數**：`['-y', 'nanobanana']`
+- **伺服器參數**：`['-y', 'mcp-image']`
 - **工具名稱**：`generate_image`
+- **環境變數**：`GEMINI_API_KEY`
+- **圖片格式**：1:1 正方形 (2048x2048)
 
 ## 錯誤處理
 
 工具處理各種錯誤情況：
 
-1. **服務不可用**：如果找不到或無法啟動 nanobanana
-2. **API 錯誤**：如果 Gemini Imagen API 失敗
-3. **逾時**：如果生成時間過長
-4. **無效回應**：如果無法提取圖片資料
-5. **Telegram 上傳錯誤**：如果無法傳送圖片
+1. **API Key 未設定**：如果 GOOGLE_API_KEY 未配置
+2. **服務不可用**：如果找不到或無法啟動 mcp-image
+3. **API 錯誤**：如果 Gemini Image API 失敗
+4. **逾時**：如果生成時間過長
+5. **無效回應**：如果無法提取圖片資料
+6. **Telegram 上傳錯誤**：如果無法傳送圖片
 
 錯誤訊息用戶友善且會建議更正操作。
 
@@ -150,30 +149,38 @@ gcloud auth application-default login
 
 1. **生成時間**：每張圖片 10-30 秒
 2. **提示語長度**：最多 1000 個字元
-3. **圖片大小**：受 Telegram 檔案大小限制（照片 10MB）
-4. **速率限制**：受 Google Cloud API 配額限制
-5. **需要確認**：始終需要使用者核准
+3. **圖片解析度**：固定為 2K (2048x2048) 正方形
+4. **圖片大小**：受 Telegram 檔案大小限制（照片 10MB）
+5. **速率限制**：受 Google AI Studio API 配額限制
 
 ## 安全性考量
 
-1. **使用者確認**：所有圖片生成請求都需要明確的使用者核准
+1. **自動執行**：圖片生成自動執行以避免逾時問題
 2. **提示語驗證**：對長度和內容進行基本驗證
 3. **錯誤訊息**：不洩露內部系統詳細資訊
 4. **資源限制**：限制提示語長度以防止濫用
 
 ## 故障排除
 
+### 「GOOGLE_API_KEY not configured」
+
+- 確認 `.env` 中已設定 `GOOGLE_API_KEY`
+- 重新啟動機器人以載入新設定
+
 ### 「圖片生成服務不可用」
 
-- 確保已安裝 nanobanana：`npm install -g nanobanana`
+- 確保已安裝 mcp-image：`npm install -g mcp-image`
 - 檢查 Node.js/npm 是否正確配置
 - 驗證網路連線
 
 ### 「無法提取圖片資料」
 
-- 檢查 nanobanana 是否為最新版本
-- 驗證 Google Cloud 認證已配置
-- 檢查 MCP 伺服器日誌以了解詳細錯誤
+- 檢查 mcp-image 是否為最新版本
+- 驗證 GOOGLE_API_KEY 是否有效
+- 檢查機器人日誌以了解詳細錯誤：
+  ```bash
+  cat bot.log | grep ImageGen
+  ```
 
 ### Telegram 中未顯示圖片
 
@@ -186,45 +193,36 @@ gcloud auth application-default login
 ### 測試 MCP 用戶端
 
 ```typescript
-import { MCPClient } from './src/mcp/client'
+import { executeMCPTool } from './src/mcp/client'
 
-const client = new MCPClient()
-await client.connect('npx', ['-y', 'nanobanana'])
-
-const tools = await client.listTools()
-console.log('Available tools:', tools)
-
-const result = await client.callTool('generate_image', {
-  prompt: 'A beautiful sunset'
-})
+const result = await executeMCPTool(
+  'npx',
+  ['-y', 'mcp-image'],
+  'generate_image',
+  {
+    prompt: 'A beautiful sunset',
+    aspectRatio: '1:1'
+  },
+  {
+    GEMINI_API_KEY: process.env.GOOGLE_API_KEY
+  }
+)
 console.log('Result:', result)
-
-await client.disconnect()
 ```
 
 ### 添加新的 MCP 工具
 
 1. 建立 MCP 用戶端實例
-2. 連接到伺服器
+2. 連接到伺服器（可傳遞環境變數）
 3. 使用參數呼叫工具
 4. 提取並處理結果
 5. 中斷連接
 
 請參閱 `src/mcp/client.ts` 以了解 helper 函式。
 
-## 未來改進
-
-- [ ] 支援多個圖片生成後端（DALL-E、Stable Diffusion）
-- [ ] 圖片編輯功能
-- [ ] 風格預設（卡通、逼真、藝術）
-- [ ] 批次圖片生成
-- [ ] 圖片轉圖片轉換
-- [ ] 負面提示語支援
-- [ ] 解析度/品質控制
-
 ## 參考資料
 
 - [MCP SDK 文件](https://github.com/modelcontextprotocol/typescript-sdk)
-- [Nano Banana GitHub](https://github.com/gemini-cli-extensions/nanobanana)
+- [mcp-image GitHub](https://github.com/anthropics/mcp-image)
 - [Grammy 檔案處理](https://grammy.dev/guide/files)
-- [Google Gemini Imagen API](https://cloud.google.com/vertex-ai/docs/generative-ai/image/overview)
+- [Google AI Studio](https://aistudio.google.com/)
