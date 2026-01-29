@@ -1,0 +1,31 @@
+{
+  "name": "gemini-telegram-bot",
+  "version": "0.1.0",
+  "description": "Telegram bot powered by Google Gemini with MCP support",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "start": "bun run src/index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["telegram", "gemini", "mcp", "bot"],
+  "author": "Vince Wang",
+  "license": "MIT",
+  "dependencies": {
+    "grammy": "^1.21.1",
+    "@google/generative-ai": "^0.21.0",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.22.4",
+    "winston": "^3.11.0",
+    "dotenv": "^16.4.1",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.6.0",
+    "playwright": "^1.41.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "typescript": "^5.3.3",
+    "bun-types": "latest"
+  }
+}
