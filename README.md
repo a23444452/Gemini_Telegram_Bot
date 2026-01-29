@@ -1,6 +1,6 @@
 # Gemini Telegram Bot
 
-A powerful Telegram bot powered by Google Gemini AI, supporting file operations, AI image generation, and intelligent conversation with function calling capabilities.
+A powerful Telegram bot powered by Google Gemini AI, supporting file operations, AI image generation, web browsing automation, and intelligent conversation with function calling capabilities.
 
 ## Features
 
@@ -8,6 +8,7 @@ A powerful Telegram bot powered by Google Gemini AI, supporting file operations,
 - **Function Calling** - Automatic tool invocation to complete tasks
 - **File Operations** - Read, write, move, copy, and delete files
 - **AI Image Generation** - Generate images using Gemini Imagen (Nano Banana)
+- **Web Browser Automation** - Browse websites, capture screenshots, and extract data with Playwright
 - **Permission Control** - All operations require user confirmation
 - **Conversation History** - Maintain multi-turn conversation context
 - **Working Directory Management** - Safe directory navigation and browsing
@@ -19,6 +20,7 @@ A powerful Telegram bot powered by Google Gemini AI, supporting file operations,
 - Telegram Bot Token
 - Google Gemini API Key
 - Google Cloud Credentials (optional, for image generation)
+- Playwright browsers (auto-installed with dependencies)
 
 ## Installation
 
@@ -37,14 +39,24 @@ bun install
 npm install
 ```
 
-### 3. Configure environment variables
+### 3. Install Playwright browsers
+
+```bash
+# Install Chromium browser for Playwright
+npx playwright install chromium
+
+# Or install all browsers
+npx playwright install
+```
+
+### 4. Configure environment variables
 
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
-### 4. Set up Telegram Bot Token
+### 5. Set up Telegram Bot Token
 
 1. Talk to [@BotFather](https://t.me/BotFather) on Telegram to create a bot
 2. Copy the bot token to `.env` as `TELEGRAM_BOT_TOKEN`
@@ -57,7 +69,7 @@ TELEGRAM_BOT_TOKEN=1234567890:ABCdefGHIjklMNOpqrsTUVwxyz
 TELEGRAM_ALLOWED_USERS=123456789,987654321
 ```
 
-### 5. Set up Google Gemini API
+### 6. Set up Google Gemini API
 
 1. Go to [Google AI Studio](https://aistudio.google.com/)
 2. Create an API Key
@@ -67,7 +79,7 @@ TELEGRAM_ALLOWED_USERS=123456789,987654321
 GOOGLE_API_KEY=AIzaSyD...your-api-key-here
 ```
 
-### 6. (Optional) Set up Image Generation
+### 7. (Optional) Set up Image Generation
 
 For AI image generation to work, you need Google Cloud credentials:
 
@@ -156,6 +168,14 @@ Bot: [Requests confirmation]
 User: [Clicks Allow]
 Bot: [Calls generate_image tool]
 Bot: [Sends generated image]
+
+User: Please browse https://example.com and summarize the content
+Bot: [Calls browse_url tool]
+Bot: The website contains...
+
+User: Take a screenshot of https://google.com
+Bot: [Calls screenshot_url tool]
+Bot: [Sends screenshot image]
 ```
 
 ### Available Tools
@@ -174,6 +194,12 @@ Bot: [Sends generated image]
 - `move_file` - Move or rename a file
 - `copy_file` - Copy a file
 
+#### Browser Operations (Auto-execute)
+
+- `browse_url` - Navigate to a URL and extract content (title and text)
+- `screenshot_url` - Take a screenshot of a webpage (returns base64 PNG)
+- `extract_data` - Extract specific data from a webpage using CSS selectors
+
 #### AI Operations (Require confirmation)
 
 - `generate_image` - Generate AI images with Gemini Imagen
@@ -191,9 +217,12 @@ gemini-telegram-bot/
 │   │   ├── function-calling.ts  # Function calling logic
 │   │   └── conversation.ts      # Conversation management
 │   ├── tools/            # Tool implementations
-│   │   ├── file-ops.ts   # File operation tools
-│   │   ├── directory-ops.ts     # Directory tools
-│   │   └── image-gen.ts  # Image generation tool
+│   │   ├── fileOperations.ts    # File operation tools
+│   │   ├── imageGeneration.ts   # Image generation tool
+│   │   └── browser/      # Browser automation tools
+│   │       ├── browse.ts # URL browsing
+│   │       ├── screenshot.ts    # Screenshot capture
+│   │       └── extract.ts       # Data extraction
 │   ├── permissions/      # Permission system
 │   │   └── manager.ts    # Permission manager
 │   ├── quota/            # Quota management
@@ -265,6 +294,23 @@ Check your quota status:
 - Adjust limits in `.env`:
   - `MAX_REQUESTS_PER_HOUR`
   - `MAX_TOKENS_PER_DAY`
+
+### Browser automation fails
+
+```bash
+# Install Playwright browsers if not already installed
+npx playwright install chromium
+
+# Check if browsers are installed correctly
+npx playwright install --dry-run
+
+# For headless mode issues, try running with headless=false
+# Set in .env:
+BROWSER_HEADLESS=false
+
+# Increase timeout for slow websites (in milliseconds)
+BROWSER_TIMEOUT=60000
+```
 
 ## Development
 
