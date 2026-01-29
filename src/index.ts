@@ -15,6 +15,7 @@ import {
   copyFileTool
 } from './tools/fileOperations'
 import { generateImageTool } from './tools/imageGeneration'
+import { browseUrlTool, screenshotUrlTool, extractDataTool } from './tools/browser'
 import { sessionManager } from './bot/middleware/session'
 import { permissionManager } from './permissions/permissionManager'
 
@@ -40,6 +41,11 @@ async function main() {
   toolRegistry.registerTool(createDirectoryTool)
   toolRegistry.registerTool(moveFileTool)
   toolRegistry.registerTool(copyFileTool)
+
+  // Browser tools (read-only)
+  toolRegistry.registerTool(browseUrlTool)
+  toolRegistry.registerTool(screenshotUrlTool)
+  toolRegistry.registerTool(extractDataTool)
 
   // AI tools (require confirmation)
   toolRegistry.registerTool(generateImageTool)
@@ -80,8 +86,13 @@ async function main() {
 • 檔案讀寫操作
 • AI 圖片生成 (需要確認)
 • 目錄管理
+• 網頁瀏覽與截圖
+• 網頁資料提取
 
-範例: "請幫我生成一張可愛的小貓圖片"
+範例:
+• "請幫我生成一張可愛的小貓圖片"
+• "幫我瀏覽 https://example.com 並總結內容"
+• "幫我截圖 https://google.com"
     `.trim()
     await ctx.reply(helpText)
   })
