@@ -56,3 +56,4 @@ playwright/.cache/
 # MCP server data
 mcp-servers/*/data/
 mcp-servers/*/logs/
+output/

@@ -34,7 +34,7 @@ export class ToolRegistry {
   /**
    * Get all tools in Gemini function declarations format
    */
-  getGeminiToolDeclarations(): GeminiFunctionDeclaration[] {
+  getGeminiToolDeclarations(): any[] {
     const declarations: GeminiFunctionDeclaration[] = []
 
     for (const tool of this.tools.values()) {
@@ -45,7 +45,8 @@ export class ToolRegistry {
       })
     }
 
-    return declarations
+    // Gemini API expects tools in this format: [{ functionDeclarations: [...] }]
+    return declarations.length > 0 ? [{ functionDeclarations: declarations }] : []
   }
 
   /**

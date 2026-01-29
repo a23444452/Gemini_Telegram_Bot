@@ -46,20 +46,17 @@ export class PermissionManager {
 
     // Generate unique request ID
     const requestId = `${userId}-${toolName}-${Date.now()}`
+    console.log(`🔐 Creating permission request - requestId: ${requestId}`)
 
     // Format params for display
     const paramsStr = JSON.stringify(params, null, 2)
-    const message = `
-⚠️ 工具執行確認
+    const message = `⚠️ 工具執行確認
 
 工具: ${toolName}
 參數:
-\`\`\`json
 ${paramsStr}
-\`\`\`
 
-是否允許執行此操作?
-    `.trim()
+是否允許執行此操作?`
 
     // Create confirmation buttons
     const keyboard = {
@@ -73,21 +70,23 @@ ${paramsStr}
 
     // Send confirmation message
     await this.bot.api.sendMessage(userId, message, {
-      reply_markup: keyboard,
-      parse_mode: 'Markdown'
+      reply_markup: keyboard
     })
 
     // Wait for user response
     return new Promise((resolve) => {
+      console.log(`⏳ Setting up Promise for requestId: ${requestId}`)
       this.pendingRequests.set(requestId, resolve)
+      console.log(`📋 Pending requests after set:`, Array.from(this.pendingRequests.keys()))
 
-      // Timeout after 30 seconds
+      // Timeout after 120 seconds (2 minutes)
       setTimeout(() => {
         if (this.pendingRequests.has(requestId)) {
+          console.log(`⏱️ Timeout reached for requestId: ${requestId}`)
           this.pendingRequests.delete(requestId)
           resolve(false) // Timeout = reject
         }
-      }, 30000)
+      }, 120000)
     })
   }
 
@@ -95,12 +94,22 @@ ${paramsStr}
    * Handle callback from user (approve/reject button click)
    * @param requestId - Unique request ID
    * @param approved - Whether user approved the request
+   * @returns true if resolver was found and executed, false if request expired
    */
-  handleCallback(requestId: string, approved: boolean): void {
+  handleCallback(requestId: string, approved: boolean): boolean {
+    console.log(`🔔 PermissionManager.handleCallback called - requestId: ${requestId}, approved: ${approved}`)
+    console.log(`📋 Pending requests:`, Array.from(this.pendingRequests.keys()))
+
     const resolver = this.pendingRequests.get(requestId)
     if (resolver) {
+      console.log(`✅ Resolver found! Resolving with: ${approved}`)
       resolver(approved)
       this.pendingRequests.delete(requestId)
+      console.log(`🗑️ Request ${requestId} deleted from pending`)
+      return true
+    } else {
+      console.log(`❌ No resolver found for requestId: ${requestId}`)
+      return false
     }
   }
 }

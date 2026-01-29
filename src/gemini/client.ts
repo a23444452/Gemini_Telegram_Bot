@@ -55,16 +55,20 @@ export class GeminiClient {
         functionCalls.map(async (fc: any) => {
           if (!toolRegistry) {
             return {
-              name: fc.name,
-              response: { error: 'Tool registry not available' }
+              functionResponse: {
+                name: fc.name,
+                response: { error: 'Tool registry not available' }
+              }
             }
           }
 
           const tool = toolRegistry.getTool(fc.name)
           if (!tool) {
             return {
-              name: fc.name,
-              response: { error: `Tool not found: ${fc.name}` }
+              functionResponse: {
+                name: fc.name,
+                response: { error: `Tool not found: ${fc.name}` }
+              }
             }
           }
 
@@ -78,10 +82,12 @@ export class GeminiClient {
 
             if (!approved) {
               return {
-                name: fc.name,
-                response: {
-                  success: false,
-                  error: 'User denied permission to execute this tool'
+                functionResponse: {
+                  name: fc.name,
+                  response: {
+                    success: false,
+                    error: 'User denied permission to execute this tool'
+                  }
                 }
               }
             }
@@ -96,8 +102,10 @@ export class GeminiClient {
           }
 
           return {
-            name: fc.name,
-            response: toolResult
+            functionResponse: {
+              name: fc.name,
+              response: toolResult
+            }
           }
         })
       )

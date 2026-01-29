@@ -7,7 +7,7 @@ export const ConfigSchema = z.object({
   }),
   gemini: z.object({
     apiKey: z.string().min(1),
-    defaultModel: z.enum(['gemini-2.0-flash-exp', 'gemini-1.5-pro']),
+    defaultModel: z.enum(['gemini-2.0-flash-exp', 'gemini-1.5-pro', 'gemini-3-pro-preview']),
   }),
   workingDirectory: z.object({
     allowedPaths: z.array(z.string()),

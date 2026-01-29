@@ -15,9 +15,10 @@ export class MCPClient {
   /**
    * Connect to an MCP server using stdio transport
    * @param serverCommand Command to start the server (e.g., 'npx')
-   * @param serverArgs Arguments for the command (e.g., ['-y', 'nanobanana'])
+   * @param serverArgs Arguments for the command (e.g., ['-y', 'mcp-image'])
+   * @param env Optional environment variables to pass to the server process
    */
-  async connect(serverCommand: string, serverArgs: string[]): Promise<void> {
+  async connect(serverCommand: string, serverArgs: string[], env?: Record<string, string>): Promise<void> {
     if (this.isConnected) {
       throw new Error('Client is already connected')
     }
@@ -25,7 +26,8 @@ export class MCPClient {
     try {
       this.transport = new StdioClientTransport({
         command: serverCommand,
-        args: serverArgs
+        args: serverArgs,
+        env: env ? { ...process.env, ...env } : undefined
       })
 
       this.client = new Client(
@@ -127,12 +129,13 @@ export async function executeMCPTool(
   serverCommand: string,
   serverArgs: string[],
   toolName: string,
-  toolArgs: Record<string, any>
+  toolArgs: Record<string, any>,
+  env?: Record<string, string>
 ): Promise<any> {
   const client = new MCPClient()
 
   try {
-    await client.connect(serverCommand, serverArgs)
+    await client.connect(serverCommand, serverArgs, env)
     const result = await client.callTool(toolName, toolArgs)
     return result
   } finally {

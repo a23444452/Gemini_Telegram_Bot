@@ -130,14 +130,56 @@ async function main() {
 
     if (data.startsWith('approve:')) {
       const requestId = data.replace('approve:', '')
-      permissionManager.handleCallback(requestId, true)
-      await ctx.answerCallbackQuery({ text: '✅ 已允許' })
-      await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+      console.log(`📝 Callback received: approve - ${requestId}`)
+
+      try {
+        // 立即回應 Telegram (避免超時)
+        await ctx.answerCallbackQuery({ text: '✅ 已允許' })
+        await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+      } catch (error) {
+        // 如果超時,忽略錯誤但繼續處理
+        console.log('⚠️ Callback query timeout (ignored):', error instanceof Error ? error.message : error)
+        // 即使 callback 超時,仍然告訴用戶我們收到了
+        try {
+          await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+        } catch {}
+      }
+
+      // 觸發工具執行
+      console.log(`✅ Triggering handleCallback: ${requestId}`)
+      const wasHandled = permissionManager.handleCallback(requestId, true)
+
+      // 如果 Promise 已經超時,告知用戶
+      if (!wasHandled) {
+        console.log('⚠️ Promise已超時,請求已過期')
+        await ctx.reply('⚠️ 此確認請求已過期,請重新傳送您的請求。')
+      }
+
     } else if (data.startsWith('reject:')) {
       const requestId = data.replace('reject:', '')
-      permissionManager.handleCallback(requestId, false)
-      await ctx.answerCallbackQuery({ text: '❌ 已拒絕' })
-      await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+      console.log(`📝 Callback received: reject - ${requestId}`)
+
+      try {
+        // 立即回應 Telegram (避免超時)
+        await ctx.answerCallbackQuery({ text: '❌ 已拒絕' })
+        await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+      } catch (error) {
+        // 如果超時,忽略錯誤但繼續處理
+        console.log('⚠️ Callback query timeout (ignored):', error instanceof Error ? error.message : error)
+        try {
+          await ctx.editMessageReplyMarkup({ reply_markup: { inline_keyboard: [] } })
+        } catch {}
+      }
+
+      // 觸發工具執行
+      console.log(`❌ Triggering handleCallback: ${requestId}`)
+      const wasHandled = permissionManager.handleCallback(requestId, false)
+
+      // 如果 Promise 已經超時,告知用戶
+      if (!wasHandled) {
+        console.log('⚠️ Promise已超時,請求已過期')
+        await ctx.reply('⚠️ 此確認請求已過期。')
+      }
     }
   })
 

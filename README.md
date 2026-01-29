@@ -4,10 +4,10 @@
 
 ## 功能特色
 
-- **Gemini AI 對話** - 使用 Gemini 2.0 Flash 進行智慧對話
+- **Gemini AI 對話** - 使用 Gemini 3 Pro Preview 進行智慧對話
 - **函式呼叫** - 自動調用工具完成任務
 - **檔案操作** - 讀取、寫入、移動、複製和刪除檔案
-- **AI 圖片生成** - 使用 Gemini Imagen (Nano Banana) 生成圖片
+- **AI 圖片生成** - 使用 Gemini 2.5 Flash Image API (mcp-image) 生成 2K 解析度圖片
 - **網頁瀏覽自動化** - 使用 Playwright 瀏覽網站、擷取截圖和提取資料
 - **權限控制** - 所有操作需要使用者確認
 - **對話歷史** - 維護多輪對話上下文
@@ -18,8 +18,7 @@
 
 - [Bun](https://bun.sh/) >= 1.0 (或 Node.js >= 18)
 - Telegram Bot Token
-- Google Gemini API Key
-- Google Cloud Credentials (選用,用於圖片生成)
+- Google Gemini API Key (用於對話和圖片生成)
 - Playwright 瀏覽器 (隨依賴項自動安裝)
 
 ## 安裝步驟
@@ -79,17 +78,14 @@ TELEGRAM_ALLOWED_USERS=123456789,987654321
 GOOGLE_API_KEY=AIzaSyD...your-api-key-here
 ```
 
-### 7. (選用) 設定圖片生成
+### 7. 圖片生成功能
 
-若要使用 AI 圖片生成功能,需要 Google Cloud 憑證:
+圖片生成使用與對話相同的 `GOOGLE_API_KEY`,無需額外設定。
 
-```bash
-# 方法 1: 使用 Google Cloud CLI (推薦)
-gcloud auth application-default login
-
-# 方法 2: 在 .env 中設定憑證檔案路徑
-GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
-```
+功能特點:
+- 使用 Gemini 2.5 Flash Image API (mcp-image MCP 伺服器)
+- 自動生成 2K 解析度 (2048x2048) 正方形圖片
+- 自動執行,無需確認即可快速生成
 
 ## 啟動與停止
 
@@ -164,10 +160,8 @@ tail -50 bot.log
 機器人: 檔案建立成功
 
 使用者: 請生成一張可愛的小貓圖片
-機器人: [請求確認]
-使用者: [點擊允許]
-機器人: [呼叫 generate_image 工具]
-機器人: [傳送生成的圖片]
+機器人: [自動呼叫 generate_image 工具]
+機器人: [傳送 2K 解析度的生成圖片]
 
 使用者: 請瀏覽 https://example.com 並總結內容
 機器人: [呼叫 browse_url 工具]
@@ -200,9 +194,9 @@ tail -50 bot.log
 - `screenshot_url` - 擷取網頁截圖 (回傳 base64 PNG)
 - `extract_data` - 使用 CSS 選擇器從網頁提取特定資料
 
-#### AI 操作 (需要確認)
+#### AI 操作 (自動執行)
 
-- `generate_image` - 使用 Gemini Imagen 生成 AI 圖片
+- `generate_image` - 使用 Gemini 2.5 Flash Image API 生成 2K 解析度 AI 圖片
 
 ## 專案結構
 
@@ -273,12 +267,20 @@ cat bot.log
 ### 圖片生成失敗
 
 ```bash
-# 檢查 Google Cloud 驗證
-gcloud auth application-default print-access-token
+# 確認 GOOGLE_API_KEY 已正確設定
+echo $GOOGLE_API_KEY
 
-# 在 Google Cloud Console 驗證 Imagen API 存取權限
-# 確保您的專案已啟用 Imagen API
+# 確認 mcp-image 可以正常執行
+npx -y mcp-image --help
+
+# 檢查機器人日誌以取得詳細錯誤訊息
+cat bot.log | grep ImageGen
 ```
+
+常見問題:
+- **API Key 無效**: 確認 `GOOGLE_API_KEY` 在 `.env` 中正確設定
+- **連線錯誤**: 檢查網路連線,稍後重試
+- **配額不足**: 在 Google AI Studio 檢查 API 配額
 
 ### 權限錯誤
 
@@ -353,7 +355,7 @@ bun run typecheck
 | `TELEGRAM_BOT_TOKEN` | Telegram Bot API token | (必填) |
 | `TELEGRAM_ALLOWED_USERS` | 逗號分隔的使用者 ID | (必填) |
 | `GOOGLE_API_KEY` | Google Gemini API key | (必填) |
-| `GEMINI_DEFAULT_MODEL` | 使用的 Gemini 模型 | `gemini-2.0-flash-exp` |
+| `GEMINI_DEFAULT_MODEL` | 使用的 Gemini 模型 | `gemini-3-pro-preview` |
 | `ALLOWED_PATHS` | 允許的目錄路徑 | `~/Documents,~/Downloads,~/Desktop` |
 | `DEFAULT_WORKING_DIR` | 預設工作目錄 | `~/Documents` |
 | `MAX_REQUESTS_PER_HOUR` | 每小時請求限制 | `100` |
@@ -380,9 +382,9 @@ bun run typecheck
 
 - **讀取操作**: 自動核准 (安全操作)
 - **寫入操作**: 需要使用者確認 (破壞性操作)
-- **AI 操作**: 需要使用者確認 (API 成本)
+- **圖片生成**: 自動執行 (避免逾時問題)
 - 透過內嵌鍵盤按鈕確認 (允許/拒絕)
-- 確認逾時 30 秒
+- 確認逾時 120 秒
 
 ### 配額系統
 
@@ -417,5 +419,5 @@ MIT
 
 - 使用 [Grammy](https://grammy.dev/) 建構 - Telegram Bot 框架
 - 由 [Google Gemini](https://ai.google.dev/) 驅動 - AI 模型
-- 透過 [Nano Banana](https://github.com/google-gemini/generative-ai-python) 生成圖片 - Gemini Imagen 包裝器
+- 透過 [mcp-image](https://github.com/anthropics/mcp-image) 生成圖片 - Gemini 2.5 Flash Image MCP 伺服器
 - 執行環境使用 [Bun](https://bun.sh/) - 快速 JavaScript 執行環境
