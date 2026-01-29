@@ -11,16 +11,17 @@ async function main() {
 
   const bot = createBot()
 
-  // Initialize Gemini client
-  const geminiClient = new GeminiClient(
-    config.gemini.apiKey,
-    config.gemini.defaultModel
-  )
-
   // Initialize tool registry
   const toolRegistry = new ToolRegistry()
   toolRegistry.registerTool(readFileTool)
   toolRegistry.registerTool(listDirectoryTool)
+
+  // Initialize Gemini client with tools
+  const geminiClient = new GeminiClient(
+    config.gemini.apiKey,
+    config.gemini.defaultModel,
+    toolRegistry.getGeminiToolDeclarations()
+  )
 
   // 基本指令
   bot.command('start', async (ctx) => {
@@ -76,8 +77,8 @@ async function main() {
     }
 
     try {
-      // 發送給 Gemini
-      const response = await geminiClient.sendMessage(userId, messageText)
+      // 發送給 Gemini (支援 function calling)
+      const response = await geminiClient.sendMessage(userId, messageText, toolRegistry)
       await ctx.reply(response)
     } catch (error) {
       console.error('Error processing message:', error)

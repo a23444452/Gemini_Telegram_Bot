@@ -5,12 +5,19 @@ import { sessionManager } from '../../src/bot/middleware/session'
 // Mock GoogleGenerativeAI
 const mockSendMessage = mock(async () => ({
   response: {
-    text: () => 'Mock response from Gemini'
+    text: () => 'Mock response from Gemini',
+    functionCalls: () => []
   }
 }))
 
+const mockGetHistory = mock(async () => [
+  { role: 'user', parts: [{ text: 'test' }] },
+  { role: 'model', parts: [{ text: 'response' }] }
+])
+
 const mockStartChat = mock(() => ({
-  sendMessage: mockSendMessage
+  sendMessage: mockSendMessage,
+  getHistory: mockGetHistory
 }))
 
 const mockGetGenerativeModel = mock(() => ({
@@ -38,6 +45,7 @@ describe('GeminiClient', () => {
     mockSendMessage.mockClear()
     mockStartChat.mockClear()
     mockGetGenerativeModel.mockClear()
+    mockGetHistory.mockClear()
 
     // Create fresh session
     sessionManager.updateSession(testUserId, {
@@ -53,7 +61,7 @@ describe('GeminiClient', () => {
       expect(client).toBeDefined()
       expect(mockGetGenerativeModel).toHaveBeenCalledWith({
         model: 'gemini-2.0-flash-exp',
-        tools: []
+        tools: undefined
       })
     })
   })
@@ -62,7 +70,8 @@ describe('GeminiClient', () => {
     it('should send a message and return response', async () => {
       mockSendMessage.mockResolvedValueOnce({
         response: {
-          text: () => 'Hello from Gemini!'
+          text: () => 'Hello from Gemini!',
+          functionCalls: () => []
         }
       } as any)
 
@@ -76,9 +85,15 @@ describe('GeminiClient', () => {
     it('should maintain conversation history in session', async () => {
       mockSendMessage.mockResolvedValueOnce({
         response: {
-          text: () => 'Response 1'
+          text: () => 'Response 1',
+          functionCalls: () => []
         }
       } as any)
+
+      mockGetHistory.mockResolvedValueOnce([
+        { role: 'user', parts: [{ text: 'Message 1' }] },
+        { role: 'model', parts: [{ text: 'Response 1' }] }
+      ])
 
       await client.sendMessage(testUserId, 'Message 1')
 
@@ -105,7 +120,8 @@ describe('GeminiClient', () => {
 
       mockSendMessage.mockResolvedValueOnce({
         response: {
-          text: () => 'New response'
+          text: () => 'New response',
+          functionCalls: () => []
         }
       } as any)
 
