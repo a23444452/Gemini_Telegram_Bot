@@ -77,7 +77,8 @@ describe('GeminiClient', () => {
 
       const response = await client.sendMessage(testUserId, 'Hello')
 
-      expect(response).toBe('Hello from Gemini!')
+      expect(response.text).toBe('Hello from Gemini!')
+      expect(response.images).toBeUndefined()
       expect(mockStartChat).toHaveBeenCalled()
       expect(mockSendMessage).toHaveBeenCalledWith('Hello')
     })

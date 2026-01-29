@@ -3,6 +3,7 @@ import { handlePwd, handleLs, handleCd } from './bot/handlers/directory'
 import { config } from './config'
 import { GeminiClient } from './gemini/client'
 import { ToolRegistry } from './gemini/tools'
+import { InputFile } from 'grammy'
 import {
   readFileTool,
   listDirectoryTool,
@@ -13,6 +14,7 @@ import {
   moveFileTool,
   copyFileTool
 } from './tools/fileOperations'
+import { generateImageTool } from './tools/imageGeneration'
 import { sessionManager } from './bot/middleware/session'
 import { permissionManager } from './permissions/permissionManager'
 
@@ -38,6 +40,9 @@ async function main() {
   toolRegistry.registerTool(createDirectoryTool)
   toolRegistry.registerTool(moveFileTool)
   toolRegistry.registerTool(copyFileTool)
+
+  // AI tools (require confirmation)
+  toolRegistry.registerTool(generateImageTool)
 
   // Initialize Gemini client with tools
   const geminiClient = new GeminiClient(
@@ -69,7 +74,14 @@ async function main() {
 /status - 查看狀態
 /model <pro|flash> - 切換模型
 
+**AI 功能**
 直接發送訊息即可與 Gemini 對話!
+可用功能包括:
+• 檔案讀寫操作
+• AI 圖片生成 (需要確認)
+• 目錄管理
+
+範例: "請幫我生成一張可愛的小貓圖片"
     `.trim()
     await ctx.reply(helpText)
   })
@@ -119,7 +131,24 @@ async function main() {
     try {
       // 發送給 Gemini (支援 function calling)
       const response = await geminiClient.sendMessage(userId, messageText, toolRegistry)
-      await ctx.reply(response)
+
+      // Send text response
+      if (response.text) {
+        await ctx.reply(response.text)
+      }
+
+      // Send images if any were generated
+      if (response.images && response.images.length > 0) {
+        for (const imageBase64 of response.images) {
+          try {
+            const imageBuffer = Buffer.from(imageBase64, 'base64')
+            await ctx.replyWithPhoto(new InputFile(imageBuffer))
+          } catch (error) {
+            console.error('Error sending image:', error)
+            await ctx.reply('❌ 圖片發送失敗')
+          }
+        }
+      }
     } catch (error) {
       console.error('Error processing message:', error)
       await ctx.reply(`❌ 處理訊息時發生錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`)

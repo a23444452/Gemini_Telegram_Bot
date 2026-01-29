@@ -4,6 +4,11 @@ import type { GeminiMessage } from '../types/session'
 import type { ToolRegistry } from './tools'
 import { permissionManager } from '../permissions/permissionManager'
 
+export interface GeminiResponse {
+  text: string
+  images?: string[] // Base64 encoded images
+}
+
 /**
  * Client for interacting with Google Gemini API
  */
@@ -24,9 +29,9 @@ export class GeminiClient {
    * @param userId - Telegram user ID
    * @param message - User message text
    * @param toolRegistry - Optional tool registry for function calling
-   * @returns Gemini's response text
+   * @returns Gemini's response (text and optional images)
    */
-  async sendMessage(userId: number, message: string, toolRegistry?: ToolRegistry): Promise<string> {
+  async sendMessage(userId: number, message: string, toolRegistry?: ToolRegistry): Promise<GeminiResponse> {
     // Get current session and conversation history
     const session = sessionManager.getSession(userId)
     const history = session.geminiContext
@@ -41,6 +46,8 @@ export class GeminiClient {
 
     // Handle function calling loop
     let functionCalls = result.response.functionCalls?.()
+    const collectedImages: string[] = []
+
     while (functionCalls && functionCalls.length > 0) {
 
       // Execute all function calls with permission checks
@@ -82,6 +89,12 @@ export class GeminiClient {
 
           // Execute tool
           const toolResult = await toolRegistry.executeTool(fc.name, fc.args, session)
+
+          // Collect images from tool results
+          if (toolResult.success && toolResult.data?.image) {
+            collectedImages.push(toolResult.data.image)
+          }
+
           return {
             name: fc.name,
             response: toolResult
@@ -102,6 +115,9 @@ export class GeminiClient {
       geminiContext: updatedHistory as GeminiMessage[]
     })
 
-    return responseText
+    return {
+      text: responseText,
+      images: collectedImages.length > 0 ? collectedImages : undefined
+    }
   }
 }
