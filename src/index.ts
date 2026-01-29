@@ -18,6 +18,7 @@ import { generateImageTool } from './tools/imageGeneration'
 import { browseUrlTool, screenshotUrlTool, extractDataTool } from './tools/browser'
 import { sessionManager } from './bot/middleware/session'
 import { permissionManager } from './permissions/permissionManager'
+import { quotaManager } from './permissions/quotaManager'
 
 async function main() {
   console.log('🚀 Starting Gemini Telegram Bot...')
@@ -88,11 +89,15 @@ async function main() {
 • 目錄管理
 • 網頁瀏覽與截圖
 • 網頁資料提取
+• 文件分析 (PDF/DOCX)
+• 檔案整理建議
+• 網頁研究報告
 
 範例:
 • "請幫我生成一張可愛的小貓圖片"
 • "幫我瀏覽 https://example.com 並總結內容"
-• "幫我截圖 https://google.com"
+• "分析這個 PDF: /path/to/file.pdf"
+• "建議如何整理 /path/to/folder"
     `.trim()
     await ctx.reply(helpText)
   })
@@ -109,6 +114,15 @@ async function main() {
   bot.command('pwd', handlePwd)
   bot.command('ls', handleLs)
   bot.command('cd', handleCd)
+
+  // 配額狀態指令
+  bot.command('status', async (ctx) => {
+    if (!ctx.from) return
+
+    const userId = ctx.from.id
+    const statusText = quotaManager.formatStatus(userId)
+    await ctx.reply(statusText, { parse_mode: 'Markdown' })
+  })
 
   // 處理權限確認的 callback query (確認按鈕點擊)
   bot.on('callback_query:data', async (ctx) => {
@@ -139,9 +153,28 @@ async function main() {
       return
     }
 
+    // Check quota before processing
+    const quotaCheck = quotaManager.checkQuota(userId)
+    if (!quotaCheck.allowed) {
+      await ctx.reply(`⚠️ ${quotaCheck.reason}\n\n使用 /status 查看詳細用量`)
+      return
+    }
+
+    // Increment request counter
+    quotaManager.incrementRequest(userId)
+
     try {
       // 發送給 Gemini (支援 function calling)
       const response = await geminiClient.sendMessage(userId, messageText, toolRegistry)
+
+      // Track tokens (estimate: ~1 token per 4 characters)
+      const estimatedTokens = Math.ceil((messageText.length + (response.text?.length || 0)) / 4)
+      quotaManager.incrementTokens(userId, estimatedTokens)
+
+      // Show warning if approaching limit
+      if (quotaCheck.warning) {
+        await ctx.reply('⚠️ 提醒: 您即將達到用量限制,請使用 /status 查看詳情')
+      }
 
       // Send text response
       if (response.text) {
