@@ -1,655 +1,655 @@
-# Testing Guide
+# 測試指南
 
-Comprehensive manual testing guide for the Gemini Telegram Bot.
+Gemini Telegram Bot 的完整手動測試指南。
 
-## Prerequisites
+## 前置條件
 
-### 1. Environment Setup
+### 1. 環境設定
 
 ```bash
-# Verify environment variables
+# 驗證環境變數
 cat .env
 
-# Required variables:
+# 所需的變數：
 # - TELEGRAM_BOT_TOKEN
 # - TELEGRAM_ALLOWED_USERS
 # - GOOGLE_API_KEY
-# - GOOGLE_APPLICATION_CREDENTIALS (for image generation)
+# - GOOGLE_APPLICATION_CREDENTIALS (用於圖片生成)
 ```
 
-### 2. Install Dependencies
+### 2. 安裝相依套件
 
 ```bash
-# Install Node dependencies
+# 安裝 Node 相依套件
 bun install
 
-# Install Playwright browsers
+# 安裝 Playwright 瀏覽器
 npx playwright install chromium
 
-# Verify TypeScript compilation
+# 驗證 TypeScript 編譯
 bun run typecheck
 ```
 
-### 3. Start the Bot
+### 3. 啟動機器人
 
 ```bash
-# Start bot in background
+# 在背景啟動機器人
 ./start.sh
 
-# Verify bot is running
+# 驗證機器人正在執行
 ./status.sh
 
-# Check logs
+# 查看日誌
 tail -f bot.log
 ```
 
-## Test Categories
+## 測試分類
 
-## 1. Authentication & Authorization
+## 1. 身份驗證與授權
 
-### Test 1.1: Authorized User Access
+### 測試 1.1：授權使用者存取
 
-**Steps:**
-1. Send `/start` to the bot from an allowed user
-2. Send `/help` command
+**步驟：**
+1. 從允許的使用者傳送 `/start` 給機器人
+2. 傳送 `/help` 命令
 
-**Expected Results:**
-- Bot responds with welcome message
-- Help menu displays all available commands
-- No error messages
+**預期結果：**
+- 機器人回應歡迎訊息
+- 幫助菜單顯示所有可用命令
+- 沒有錯誤訊息
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 1.2: Unauthorized User Access
+### 測試 1.2：未授權使用者存取
 
-**Steps:**
-1. Send `/start` from a user NOT in `TELEGRAM_ALLOWED_USERS`
+**步驟：**
+1. 從 NOT 在 `TELEGRAM_ALLOWED_USERS` 中的使用者傳送 `/start`
 
-**Expected Results:**
-- Bot responds with "Access denied" or similar message
-- Bot ignores all subsequent commands from this user
+**預期結果：**
+- 機器人回應「存取被拒」或類似訊息
+- 機器人忽略此使用者的所有後續命令
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 2. Basic Commands
+## 2. 基本命令
 
-### Test 2.1: Directory Navigation
+### 測試 2.1：目錄導覽
 
-**Steps:**
-1. Send `/pwd` - Show current directory
-2. Send `/ls` - List current directory
-3. Send `/cd /tmp` - Change to /tmp directory
-4. Send `/pwd` - Verify directory changed
+**步驟：**
+1. 傳送 `/pwd` - 顯示目前目錄
+2. 傳送 `/ls` - 列出目前目錄
+3. 傳送 `/cd /tmp` - 切換到 /tmp 目錄
+4. 傳送 `/pwd` - 驗證目錄已變更
 
-**Expected Results:**
-- `/pwd` shows current working directory path
-- `/ls` shows directory contents with file/folder icons
-- `/cd` successfully changes directory (if path is allowed)
-- Working directory persists across commands
+**預期結果：**
+- `/pwd` 顯示目前工作目錄路徑
+- `/ls` 顯示目錄內容，包含檔案/資料夾圖示
+- `/cd` 成功變更目錄（如果路徑被允許）
+- 工作目錄在命令之間持續存在
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 2.2: New Conversation
+### 測試 2.2：新對話
 
-**Steps:**
-1. Have a conversation with the bot
-2. Send `/new` command
-3. Reference previous conversation
+**步驟：**
+1. 與機器人進行對話
+2. 傳送 `/new` 命令
+3. 參考前一個對話
 
-**Expected Results:**
-- `/new` clears conversation history
-- Bot does not remember previous context
-- Confirmation message displayed
+**預期結果：**
+- `/new` 清除對話歷史
+- 機器人不記得前一個內容
+- 顯示確認訊息
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 3. File Operations (Read)
+## 3. 檔案操作（讀取）
 
-### Test 3.1: Read File
+### 測試 3.1：讀取檔案
 
-**Steps:**
-1. Create a test file: `echo "Hello World" > /tmp/test.txt`
-2. Send to bot: "Please read the file /tmp/test.txt"
+**步驟：**
+1. 建立測試檔案：`echo "Hello World" > /tmp/test.txt`
+2. 傳送給機器人：「請讀取 /tmp/test.txt 檔案」
 
-**Expected Results:**
-- Bot calls `read_file` tool automatically (no confirmation needed)
-- Bot displays file contents: "Hello World"
-- No permission prompt shown (read is auto-approved)
+**預期結果：**
+- 機器人自動呼叫 `read_file` 工具（不需要確認）
+- 機器人顯示檔案內容：「Hello World」
+- 沒有顯示權限提示（讀取自動批准）
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 3.2: List Directory
+### 測試 3.2：列出目錄
 
-**Steps:**
-1. Send to bot: "Please list the files in /tmp"
+**步驟：**
+1. 傳送給機器人：「請列出 /tmp 中的檔案」
 
-**Expected Results:**
-- Bot calls `list_directory` tool automatically
-- Bot displays file and folder names
-- Shows relative sizes and types
+**預期結果：**
+- 機器人自動呼叫 `list_directory` 工具
+- 機器人顯示檔案和資料夾名稱
+- 顯示相對大小和類型
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 4. File Operations (Write)
+## 4. 檔案操作（寫入）
 
-### Test 4.1: Write File
+### 測試 4.1：寫入檔案
 
-**Steps:**
-1. Send to bot: "Please create a file /tmp/bot_test.txt with content 'Testing write'"
-2. Click "Allow" on permission prompt
-3. Verify file exists: `cat /tmp/bot_test.txt`
+**步驟：**
+1. 傳送給機器人：「請建立 /tmp/bot_test.txt 檔案，內容為『測試寫入』」
+2. 點擊權限提示中的「允許」
+3. 驗證檔案存在：`cat /tmp/bot_test.txt`
 
-**Expected Results:**
-- Bot shows permission prompt with file path and content preview
-- After approval, bot executes `write_file` tool
-- File is created with correct content
-- Bot confirms success
+**預期結果：**
+- 機器人顯示權限提示，包含檔案路徑和內容預覽
+- 批准後，機器人執行 `write_file` 工具
+- 檔案使用正確內容建立
+- 機器人確認成功
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 4.2: Deny Write Operation
+### 測試 4.2：拒絕寫入操作
 
-**Steps:**
-1. Send to bot: "Please create a file /tmp/denied.txt with content 'Test'"
-2. Click "Deny" on permission prompt
+**步驟：**
+1. 傳送給機器人：「請建立 /tmp/denied.txt 檔案，內容為『測試』」
+2. 點擊權限提示中的「拒絕」
 
-**Expected Results:**
-- Bot shows permission prompt
-- After denial, bot does NOT create file
-- Bot responds with "Operation cancelled" or similar
-- File does not exist
+**預期結果：**
+- 機器人顯示權限提示
+- 拒絕後，機器人不建立檔案
+- 機器人回應「操作已取消」或類似訊息
+- 檔案不存在
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 4.3: Append to File
+### 測試 4.3：附加到檔案
 
-**Steps:**
-1. Create initial file: `echo "Line 1" > /tmp/append_test.txt`
-2. Send to bot: "Please append 'Line 2' to /tmp/append_test.txt"
-3. Approve operation
-4. Verify: `cat /tmp/append_test.txt`
+**步驟：**
+1. 建立初始檔案：`echo "Line 1" > /tmp/append_test.txt`
+2. 傳送給機器人：「請附加『Line 2』到 /tmp/append_test.txt」
+3. 批准操作
+4. 驗證：`cat /tmp/append_test.txt`
 
-**Expected Results:**
-- Bot requests permission for append operation
-- After approval, content is appended (not overwritten)
-- File contains both lines
+**預期結果：**
+- 機器人要求附加操作的權限
+- 批准後，內容被附加（不是覆蓋）
+- 檔案包含兩行
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 4.4: Delete File
+### 測試 4.4：刪除檔案
 
-**Steps:**
-1. Create test file: `touch /tmp/delete_me.txt`
-2. Send to bot: "Please delete /tmp/delete_me.txt"
-3. Approve operation
-4. Verify: `ls /tmp/delete_me.txt` (should not exist)
+**步驟：**
+1. 建立測試檔案：`touch /tmp/delete_me.txt`
+2. 傳送給機器人：「請刪除 /tmp/delete_me.txt」
+3. 批准操作
+4. 驗證：`ls /tmp/delete_me.txt`（應該不存在）
 
-**Expected Results:**
-- Bot shows permission prompt with file path
-- After approval, file is deleted
-- Bot confirms deletion
-- File no longer exists
+**預期結果：**
+- 機器人顯示包含檔案路徑的權限提示
+- 批准後，檔案被刪除
+- 機器人確認刪除
+- 檔案不再存在
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 4.5: Create Directory
+### 測試 4.5：建立目錄
 
-**Steps:**
-1. Send to bot: "Please create a directory /tmp/test_dir"
-2. Approve operation
-3. Verify: `ls -ld /tmp/test_dir`
+**步驟：**
+1. 傳送給機器人：「請建立 /tmp/test_dir 目錄」
+2. 批准操作
+3. 驗證：`ls -ld /tmp/test_dir`
 
-**Expected Results:**
-- Bot requests permission
-- Directory is created after approval
-- Bot confirms success
+**預期結果：**
+- 機器人要求權限
+- 批准後建立目錄
+- 機器人確認成功
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 4.6: Move/Rename File
+### 測試 4.6：移動/重新命名檔案
 
-**Steps:**
-1. Create file: `echo "Move me" > /tmp/source.txt`
-2. Send to bot: "Please move /tmp/source.txt to /tmp/destination.txt"
-3. Approve operation
-4. Verify both paths
+**步驟：**
+1. 建立檔案：`echo "Move me" > /tmp/source.txt`
+2. 傳送給機器人：「請將 /tmp/source.txt 移動到 /tmp/destination.txt」
+3. 批准操作
+4. 驗證兩個路徑
 
-**Expected Results:**
-- Bot requests permission showing source and destination
-- Source file is moved/renamed to destination
-- Source no longer exists, destination has correct content
+**預期結果：**
+- 機器人要求權限，顯示來源和目的地
+- 來源檔案被移動/重新命名為目的地
+- 來源不再存在，目的地有正確的內容
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 4.7: Copy File
+### 測試 4.7：複製檔案
 
-**Steps:**
-1. Create file: `echo "Copy me" > /tmp/original.txt`
-2. Send to bot: "Please copy /tmp/original.txt to /tmp/copy.txt"
-3. Approve operation
-4. Verify both files exist
+**步驟：**
+1. 建立檔案：`echo "Copy me" > /tmp/original.txt`
+2. 傳送給機器人：「請複製 /tmp/original.txt 到 /tmp/copy.txt」
+3. 批准操作
+4. 驗證兩個檔案都存在
 
-**Expected Results:**
-- Bot requests permission showing source and destination
-- Both files exist after operation
-- Both files have identical content
+**預期結果：**
+- 機器人要求權限，顯示來源和目的地
+- 操作後兩個檔案都存在
+- 兩個檔案的內容相同
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 5. Browser Automation
+## 5. 瀏覽器自動化
 
-### Test 5.1: Browse URL
+### 測試 5.1：瀏覽 URL
 
-**Steps:**
-1. Send to bot: "Please browse https://example.com and tell me what it says"
+**步驟：**
+1. 傳送給機器人：「請瀏覽 https://example.com 並告訴我裡面寫什麼」
 
-**Expected Results:**
-- Bot calls `browse_url` tool automatically (no confirmation)
-- Bot extracts page title and text content
-- Bot summarizes the webpage content
-- Operation completes within timeout (30 seconds default)
+**預期結果：**
+- 機器人自動呼叫 `browse_url` 工具（不需要確認）
+- 機器人提取頁面標題和文字內容
+- 機器人總結網頁內容
+- 操作在逾時內完成（預設 30 秒）
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 5.2: Screenshot URL
+### 測試 5.2：網址螢幕截圖
 
-**Steps:**
-1. Send to bot: "Take a screenshot of https://google.com"
+**步驟：**
+1. 傳送給機器人：「對 https://google.com 進行螢幕截圖」
 
-**Expected Results:**
-- Bot calls `screenshot_url` tool automatically
-- Bot sends screenshot image in PNG format
-- Image shows the actual webpage
-- Operation completes within timeout
+**預期結果：**
+- 機器人自動呼叫 `screenshot_url` 工具
+- 機器人以 PNG 格式傳送螢幕截圖
+- 圖片顯示實際的網頁
+- 操作在逾時內完成
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 5.3: Extract Data from Webpage
+### 測試 5.3：從網頁提取資料
 
-**Steps:**
-1. Send to bot: "Extract the main heading from https://example.com"
+**步驟：**
+1. 傳送給機器人：「從 https://example.com 提取主標題」
 
-**Expected Results:**
-- Bot calls `extract_data` tool with appropriate CSS selector
-- Bot extracts and returns the heading text
-- Handles missing elements gracefully
+**預期結果：**
+- 機器人使用適當的 CSS 選擇器呼叫 `extract_data` 工具
+- 機器人提取並返回標題文字
+- 優雅處理遺失的元素
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 6. AI Image Generation
+## 6. AI 圖片生成
 
-### Test 6.1: Generate Image
+### 測試 6.1：生成圖片
 
-**Steps:**
-1. Send to bot: "Generate an image of a cute kitten playing with yarn"
-2. Click "Allow" on permission prompt
+**步驟：**
+1. 傳送給機器人：「生成一隻可愛的小貓玩毛線的圖片」
+2. 點擊權限提示中的「允許」
 
-**Expected Results:**
-- Bot shows permission prompt (image generation costs API quota)
-- After approval, bot calls `generate_image` tool
-- Bot sends generated image
-- Image matches the description
+**預期結果：**
+- 機器人顯示權限提示（圖片生成會消耗 API 配額）
+- 批准後，機器人呼叫 `generate_image` 工具
+- 機器人傳送生成的圖片
+- 圖片符合說明
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 6.2: Image Generation Failure Handling
+### 測試 6.2：圖片生成失敗處理
 
-**Steps:**
-1. If Google Cloud credentials are not configured, try generating an image
+**步驟：**
+1. 如果 Google Cloud 認證未配置，請嘗試生成圖片
 
-**Expected Results:**
-- Bot shows appropriate error message
-- Error explains authentication requirement
-- Bot suggests checking GOOGLE_APPLICATION_CREDENTIALS
+**預期結果：**
+- 機器人顯示適當的錯誤訊息
+- 錯誤說明需要身份驗證
+- 機器人建議檢查 GOOGLE_APPLICATION_CREDENTIALS
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 7. Document Analysis
+## 7. 文件分析
 
-### Test 7.1: Analyze PDF Document
+### 測試 7.1：分析 PDF 文件
 
-**Steps:**
-1. Create or download a test PDF file
-2. Send to bot: "Please analyze the PDF at /path/to/document.pdf"
+**步驟：**
+1. 建立或下載測試 PDF 檔案
+2. 傳送給機器人：「請分析 /path/to/document.pdf」
 
-**Expected Results:**
-- Bot extracts text from PDF
-- Bot summarizes document content
-- Handles multi-page PDFs correctly
+**預期結果：**
+- 機器人從 PDF 提取文字
+- 機器人總結文件內容
+- 正確處理多頁 PDF
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 7.2: Analyze Word Document
+### 測試 7.2：分析 Word 文件
 
-**Steps:**
-1. Create or download a test DOCX file
-2. Send to bot: "Please analyze the document at /path/to/document.docx"
+**步驟：**
+1. 建立或下載測試 DOCX 檔案
+2. 傳送給機器人：「請分析 /path/to/document.docx」
 
-**Expected Results:**
-- Bot extracts text from DOCX
-- Bot summarizes document content
-- Preserves basic formatting information
+**預期結果：**
+- 機器人從 DOCX 提取文字
+- 機器人總結文件內容
+- 保留基本格式資訊
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 8. File Organization
+## 8. 檔案組織
 
-### Test 8.1: Organize Files by Type
+### 測試 8.1：按類型組織檔案
 
-**Steps:**
-1. Create test directory with mixed files:
+**步驟：**
+1. 建立包含混合檔案的測試目錄：
    ```bash
    mkdir /tmp/test_organize
    touch /tmp/test_organize/{test1.txt,test2.txt,image.jpg,doc.pdf}
    ```
-2. Send to bot: "Please organize files in /tmp/test_organize by type"
-3. Approve operation
+2. 傳送給機器人：「請按類型組織 /tmp/test_organize 中的檔案」
+3. 批准操作
 
-**Expected Results:**
-- Bot creates subdirectories (documents/, images/, etc.)
-- Files are moved to appropriate subdirectories
-- Original directory structure is updated
-- Bot provides summary of organization
+**預期結果：**
+- 機器人建立子目錄（documents/、images/ 等）
+- 檔案被移動到適當的子目錄
+- 原始目錄結構已更新
+- 機器人提供組織摘要
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 9. Web Research
+## 9. 網路搜尋
 
-### Test 9.1: Search and Summarize
+### 測試 9.1：搜尋並總結
 
-**Steps:**
-1. Send to bot: "Search for information about TypeScript and summarize the results"
+**步驟：**
+1. 傳送給機器人：「搜尋 TypeScript 的資訊並總結結果」
 
-**Expected Results:**
-- Bot performs web search (if search tool is available)
-- Bot summarizes search results
-- Provides relevant links or citations
+**預期結果：**
+- 機器人執行網路搜尋（如果搜尋工具可用）
+- 機器人總結搜尋結果
+- 提供相關連結或引用
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 10. Security & Path Validation
+## 10. 安全性與路徑驗證
 
-### Test 10.1: Blocked Path Access
+### 測試 10.1：已阻止的路徑存取
 
-**Steps:**
-1. Send to bot: "Read the file ~/.ssh/id_rsa"
+**步驟：**
+1. 傳送給機器人：「讀取 ~/.ssh/id_rsa 檔案」
 
-**Expected Results:**
-- Bot denies access to sensitive path
-- Error message explains path is not allowed
-- No permission prompt shown (hard block)
+**預期結果：**
+- 機器人拒絕存取敏感路徑
+- 錯誤訊息解釋路徑不被允許
+- 不顯示權限提示（硬性阻止）
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 10.2: Path Traversal Prevention
+### 測試 10.2：路徑遍歷預防
 
-**Steps:**
-1. Send to bot: "Read the file /allowed/path/../../etc/passwd"
+**步驟：**
+1. 傳送給機器人：「讀取 /allowed/path/../../etc/passwd 檔案」
 
-**Expected Results:**
-- Bot detects path traversal attempt
-- Access is denied
-- Error message shown
+**預期結果：**
+- 機器人檢測路徑遍歷嘗試
+- 存取被拒絕
+- 顯示錯誤訊息
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 10.3: Outside Allowed Paths
+### 測試 10.3：在允許路徑外
 
-**Steps:**
-1. Send to bot: "List files in /root"
+**步驟：**
+1. 傳送給機器人：「列出 /root 中的檔案」
 
-**Expected Results:**
-- Bot checks if path is in ALLOWED_PATHS
-- If not allowed, operation is denied
-- Error message explains allowed paths
+**預期結果：**
+- 機器人檢查路徑是否在 ALLOWED_PATHS 中
+- 如果不允許，操作被拒絕
+- 錯誤訊息說明允許的路徑
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 11. Quota Management
+## 11. 配額管理
 
-### Test 11.1: Normal Quota Usage
+### 測試 11.1：正常配額使用
 
-**Steps:**
-1. Check initial quota: Send a few messages
-2. Bot should track token usage
+**步驟：**
+1. 檢查初始配額：傳送幾條訊息
+2. 機器人應追蹤令牌使用
 
-**Expected Results:**
-- Quota is tracked per user
-- No warnings initially
-- Usage increases with each request
+**預期結果：**
+- 配額按使用者追蹤
+- 最初沒有警告
+- 每個請求的使用都會增加
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 11.2: Quota Warning
+### 測試 11.2：配額警告
 
-**Steps:**
-1. Generate enough requests to reach 80% of quota
-2. Continue sending messages
+**步驟：**
+1. 生成足夠的請求以達到配額的 80%
+2. 繼續傳送訊息
 
-**Expected Results:**
-- At 80% threshold, bot shows warning
-- Warning includes current usage and limit
-- Bot still processes requests
+**預期結果：**
+- 達到 80% 閾值時，機器人顯示警告
+- 警告包含目前使用和限制
+- 機器人仍然處理請求
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 11.3: Quota Limit Exceeded
+### 測試 11.3：超過配額限制
 
-**Steps:**
-1. Continue requests beyond quota limit
+**步驟：**
+1. 繼續超過配額限制的請求
 
-**Expected Results:**
-- Bot refuses new requests
-- Error message explains quota exceeded
-- Message includes reset time
+**預期結果：**
+- 機器人拒絕新請求
+- 錯誤訊息解釋配額已超出
+- 訊息包含重設時間
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 12. MCP Integration
+## 12. MCP 整合
 
-### Test 12.1: MCP Server Connection
+### 測試 12.1：MCP 伺服器連線
 
-**Steps:**
-1. Configure MCP server in config
-2. Restart bot
-3. Send command that uses MCP tool
+**步驟：**
+1. 在配置中配置 MCP 伺服器
+2. 重新啟動機器人
+3. 傳送使用 MCP 工具的命令
 
-**Expected Results:**
-- Bot connects to MCP server
-- MCP tools are available in tool registry
-- Tools execute correctly
+**預期結果：**
+- 機器人連接到 MCP 伺服器
+- MCP 工具在工具註冊表中可用
+- 工具正確執行
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 12.2: MCP Server Failure
+### 測試 12.2：MCP 伺服器失敗
 
-**Steps:**
-1. Stop MCP server or misconfigure
-2. Try to use MCP tool
+**步驟：**
+1. 停止 MCP 伺服器或錯誤配置
+2. 嘗試使用 MCP 工具
 
-**Expected Results:**
-- Bot detects MCP server unavailable
-- Error message is user-friendly
-- Bot continues working with other tools
+**預期結果：**
+- 機器人偵測 MCP 伺服器不可用
+- 錯誤訊息對使用者友善
+- 機器人繼續使用其他工具
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 13. Conversation & Context
+## 13. 對話與內容
 
-### Test 13.1: Multi-turn Conversation
+### 測試 13.1：多輪對話
 
-**Steps:**
-1. Send: "Create a file called test.txt with content 'Hello'"
-2. Approve and wait for completion
-3. Send: "Now read that file"
+**步驟：**
+1. 傳送：「建立一個叫 test.txt 的檔案，內容為『Hello』」
+2. 批准並等待完成
+3. 傳送：「現在讀取該檔案」
 
-**Expected Results:**
-- Bot remembers context from first message
-- Bot understands "that file" refers to test.txt
-- Operation completes successfully
+**預期結果：**
+- 機器人記住第一條訊息的內容
+- 機器人理解「該檔案」指的是 test.txt
+- 操作成功完成
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 13.2: Context Persistence
+### 測試 13.2：內容持續性
 
-**Steps:**
-1. Have a conversation about a specific topic
-2. Bot should maintain context across multiple messages
-3. Send `/new` to clear context
-4. Reference previous conversation
+**步驟：**
+1. 進行關於特定主題的對話
+2. 機器人應在多條訊息中維護內容
+3. 傳送 `/new` 清除內容
+4. 參考前一個對話
 
-**Expected Results:**
-- Bot remembers conversation context
-- Context is cleared after `/new`
-- Bot does not remember cleared context
+**預期結果：**
+- 機器人記住對話內容
+- `/new` 後內容被清除
+- 機器人不記得已清除的內容
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 14. Error Handling
+## 14. 錯誤處理
 
-### Test 14.1: Invalid File Path
+### 測試 14.1：無效檔案路徑
 
-**Steps:**
-1. Send to bot: "Read the file /nonexistent/path/file.txt"
+**步驟：**
+1. 傳送給機器人：「讀取 /nonexistent/path/file.txt 檔案」
 
-**Expected Results:**
-- Bot attempts operation
-- Returns clear error message
-- Error explains file not found
+**預期結果：**
+- 機器人嘗試操作
+- 返回清晰的錯誤訊息
+- 錯誤說明找不到檔案
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 14.2: Permission Timeout
+### 測試 14.2：權限逾時
 
-**Steps:**
-1. Send write operation request
-2. Wait 30 seconds without responding to permission prompt
+**步驟：**
+1. 傳送寫入操作請求
+2. 等待 30 秒而不回應權限提示
 
-**Expected Results:**
-- Permission request times out
-- Operation is automatically denied
-- Bot sends timeout message
+**預期結果：**
+- 權限請求逾時
+- 操作自動被拒絕
+- 機器人傳送逾時訊息
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 14.3: Network Error
+### 測試 14.3：網路錯誤
 
-**Steps:**
-1. Disconnect internet
-2. Try to browse URL or generate image
+**步驟：**
+1. 斷開網路連接
+2. 嘗試瀏覽 URL 或生成圖片
 
-**Expected Results:**
-- Bot handles network error gracefully
-- Error message is user-friendly
-- Bot remains operational
+**預期結果：**
+- 機器人優雅地處理網路錯誤
+- 錯誤訊息對使用者友善
+- 機器人保持可操作
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## 15. Performance & Stability
+## 15. 效能與穩定性
 
-### Test 15.1: Large File Handling
+### 測試 15.1：大檔案處理
 
-**Steps:**
-1. Create large file: `dd if=/dev/zero of=/tmp/large.bin bs=1M count=10`
-2. Send to bot: "Read the file /tmp/large.bin"
+**步驟：**
+1. 建立大檔案：`dd if=/dev/zero of=/tmp/large.bin bs=1M count=10`
+2. 傳送給機器人：「讀取 /tmp/large.bin 檔案」
 
-**Expected Results:**
-- Bot handles large file appropriately
-- Returns error or truncates if file too large
-- Bot remains responsive
+**預期結果：**
+- 機器人適當處理大檔案
+- 如果檔案太大，返回錯誤或截斷
+- 機器人保持回應
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 15.2: Concurrent Requests
+### 測試 15.2：並行請求
 
-**Steps:**
-1. Send multiple messages quickly (5-10 messages)
-2. All should be different commands
+**步驟：**
+1. 快速傳送多條訊息（5-10 條訊息）
+2. 所有應為不同的命令
 
-**Expected Results:**
-- Bot processes all requests
-- Responses may be queued but all complete
-- No crashes or errors
+**預期結果：**
+- 機器人處理所有請求
+- 回應可能排隊但全部完成
+- 無崩潰或錯誤
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-### Test 15.3: Long-running Operation
+### 測試 15.3：長時間執行操作
 
-**Steps:**
-1. Browse a slow-loading website
-2. Wait for operation to complete
+**步驟：**
+1. 瀏覽載入緩慢的網站
+2. 等待操作完成
 
-**Expected Results:**
-- Bot shows typing indicator while processing
-- Operation completes or times out gracefully
-- Timeout duration matches BROWSER_TIMEOUT setting
+**預期結果：**
+- 機器人在處理時顯示輸入指示器
+- 操作完成或優雅逾時
+- 逾時時間與 BROWSER_TIMEOUT 設定相符
 
-**Status:** ⬜ Not Tested | ✅ Pass | ❌ Fail
+**狀態：** ⬜ 未測試 | ✅ 通過 | ❌ 失敗
 
-## Troubleshooting
+## 疑難排解
 
-### Common Issues
+### 常見問題
 
-#### Bot not responding
+#### 機器人不回應
 ```bash
-# Check if bot is running
+# 檢查機器人是否執行
 ./status.sh
 
-# Check logs for errors
+# 檢查日誌中的錯誤
 tail -50 bot.log
 
-# Restart bot
+# 重新啟動機器人
 ./stop.sh && ./start.sh
 ```
 
-#### Permission prompts not showing
-- Check user ID is in TELEGRAM_ALLOWED_USERS
-- Verify operation requires permission (writes, not reads)
-- Check bot logs for errors
+#### 權限提示未顯示
+- 檢查使用者 ID 是否在 TELEGRAM_ALLOWED_USERS 中
+- 驗證操作需要權限（寫入，不是讀取）
+- 檢查機器人日誌中的錯誤
 
-#### Tools not working
+#### 工具不工作
 ```bash
-# Check environment variables
+# 檢查環境變數
 cat .env
 
-# Verify dependencies
+# 驗證相依套件
 bun install
 npx playwright install chromium
 
-# Check TypeScript compilation
+# 檢查 TypeScript 編譯
 bun run typecheck
 ```
 
-#### Quota issues
-- Check quota limits in .env
-- Wait for quota reset (hourly/daily)
-- Adjust limits if needed
+#### 配額問題
+- 檢查 .env 中的配額限制
+- 等待配額重設（每小時/每天）
+- 如需要，調整限制
 
-## Test Summary Template
+## 測試摘要模板
 
-Date: _______________
-Tester: _______________
+日期：_______________
+測試者：_______________
 
-Total Tests: 44
-Passed: ___ / 44
-Failed: ___ / 44
-Not Tested: ___ / 44
+總測試數：44
+通過：___ / 44
+失敗：___ / 44
+未測試：___ / 44
 
-Critical Failures: _______
-Notes: _______________________
+關鍵失敗：_______
+備註：_______________________
 
-## Continuous Testing
+## 持續測試
 
-For ongoing development:
-1. Run these tests after each major feature addition
-2. Run subset of tests before each release
-3. Add new test cases for new features
-4. Update test cases when behavior changes
+進行中的開發：
+1. 在每次主要功能新增後執行這些測試
+2. 在每次發行前執行測試子集
+3. 為新功能新增新測試案例
+4. 行為變更時更新測試案例
 
-## Automated Testing
+## 自動化測試
 
-While this guide focuses on manual testing, consider:
-- Writing unit tests for core functions
-- Adding integration tests for tool execution
-- Creating end-to-end tests with Playwright
-- Setting up CI/CD pipeline for automated testing
+雖然本指南側重於手動測試，請考慮：
+- 為核心函數編寫單位測試
+- 為工具執行新增整合測試
+- 使用 Playwright 建立端到端測試
+- 為自動化測試設定 CI/CD 管線

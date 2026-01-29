@@ -1,658 +1,658 @@
-# Project Summary
+# 專案摘要
 
-Comprehensive summary of the Gemini Telegram Bot project.
+Gemini Telegram Bot 專案的完整摘要。
 
-## Project Overview
+## 專案概況
 
-**Name:** Gemini Telegram Bot
-**Version:** 0.1.0
-**Status:** Production Ready
-**License:** MIT
-**Author:** Vince Wang
+**名稱：** Gemini Telegram Bot
+**版本：** 0.1.0
+**狀態：** 生產環境就緒
+**授權：** MIT
+**作者：** Vince Wang
 
-### Description
+### 說明
 
-A powerful Telegram bot powered by Google Gemini AI with function calling capabilities, supporting file operations, AI image generation, web browsing automation, document analysis, file organization, and web research.
+一個由 Google Gemini AI 驅動的功能強大的 Telegram Bot，具有函式呼叫功能，支援檔案操作、AI 圖片生成、網頁瀏覽自動化、文件分析、檔案整理和網路研究。
 
-## Statistics
+## 統計資訊
 
-### Codebase Metrics
+### 程式碼基礎指標
 
-- **Total Commits:** 35
-- **TypeScript Files:** 25
-- **Total Lines of Code:** ~2,955 lines
-- **Tools Implemented:** 12 tools
-- **Shell Scripts:** 3 (start.sh, stop.sh, status.sh)
-- **Documentation Files:** 10+ (README, guides, summaries)
+- **總 Commit 數：** 35
+- **TypeScript 檔案：** 25
+- **程式碼總行數：** 約 2,955 行
+- **實作工具數：** 12 個
+- **Shell 腳本：** 3 個 (start.sh、stop.sh、status.sh)
+- **文件檔案：** 10 個以上 (README、指南、摘要)
 
-### Project Structure
+### 專案結構
 
 ```
 gemini-telegram-bot/
-├── src/                      # Source code (25 TypeScript files)
-│   ├── bot/                  # Telegram bot logic
-│   │   ├── bot.ts           # Main bot instance
-│   │   ├── handlers/        # Command handlers
-│   │   │   └── directory.ts # Directory navigation
-│   │   └── middleware/      # Bot middleware
-│   │       ├── auth.ts      # Authentication
-│   │       └── session.ts   # Session management
-│   ├── gemini/              # Gemini AI integration
-│   │   ├── client.ts        # Gemini API client
-│   │   └── tools.ts         # Tool registry
-│   ├── tools/               # Tool implementations
-│   │   ├── fileOperations.ts       # File I/O tools
-│   │   ├── imageGeneration.ts      # AI image generation
-│   │   ├── browser/         # Browser automation
-│   │   │   ├── browse.ts    # URL browsing
-│   │   │   ├── screenshot.ts # Screenshot capture
-│   │   │   ├── extract.ts   # Data extraction
-│   │   │   └── index.ts     # Browser exports
-│   │   ├── files/           # File management
-│   │   │   └── organizeFiles.ts # File organization
-│   │   ├── documents/       # Document processing
-│   │   │   └── analyze.ts   # PDF/DOCX analysis
-│   │   └── research/        # Web research
-│   │       └── search.ts    # Search and summarize
-│   ├── permissions/         # Permission system
-│   │   ├── permissionManager.ts # Permission handling
-│   │   ├── pathValidator.ts     # Path security
-│   │   └── quotaManager.ts      # Quota tracking
-│   ├── mcp/                 # MCP integration
-│   │   └── client.ts        # MCP client
-│   ├── types/               # TypeScript types
-│   │   ├── config.ts        # Config types
-│   │   ├── session.ts       # Session types
-│   │   ├── tool.ts          # Tool types
-│   │   └── permission.ts    # Permission types
-│   ├── config.ts            # Configuration loader
-│   └── index.ts             # Entry point
-├── tests/                   # Test suites
-├── docs/                    # Documentation
-├── config/                  # Config files
-├── data/                    # Runtime data
-│   └── users.json          # User permissions
-├── logs/                    # Log files
-├── mcp-servers/            # MCP server configs
-├── start.sh                # Start script
-├── stop.sh                 # Stop script
-├── status.sh               # Status check script
-├── .env.example            # Environment template
-├── package.json            # Dependencies
-├── tsconfig.json           # TypeScript config
-├── README.md               # Main documentation
-├── TESTING_GUIDE.md        # Testing guide
-├── OPTIMIZATION.md         # Optimization guide
-└── PROJECT_SUMMARY.md      # This file
+├── src/                      # 原始碼 (25 個 TypeScript 檔案)
+│   ├── bot/                  # Telegram Bot 邏輯
+│   │   ├── bot.ts           # 主要 Bot 實例
+│   │   ├── handlers/        # 指令處理器
+│   │   │   └── directory.ts # 目錄導航
+│   │   └── middleware/      # Bot 中間件
+│   │       ├── auth.ts      # 驗證
+│   │       └── session.ts   # 工作階段管理
+│   ├── gemini/              # Gemini AI 整合
+│   │   ├── client.ts        # Gemini API 客戶端
+│   │   └── tools.ts         # 工具註冊表
+│   ├── tools/               # 工具實作
+│   │   ├── fileOperations.ts       # 檔案 I/O 工具
+│   │   ├── imageGeneration.ts      # AI 圖片生成
+│   │   ├── browser/         # 網頁瀏覽自動化
+│   │   │   ├── browse.ts    # URL 瀏覽
+│   │   │   ├── screenshot.ts # 截圖擷取
+│   │   │   ├── extract.ts   # 資料抽取
+│   │   │   └── index.ts     # 瀏覽器匯出
+│   │   ├── files/           # 檔案管理
+│   │   │   └── organizeFiles.ts # 檔案整理
+│   │   ├── documents/       # 文件處理
+│   │   │   └── analyze.ts   # PDF/DOCX 分析
+│   │   └── research/        # 網路研究
+│   │       └── search.ts    # 搜尋與總結
+│   ├── permissions/         # 權限系統
+│   │   ├── permissionManager.ts # 權限處理
+│   │   ├── pathValidator.ts     # 路徑安全驗證
+│   │   └── quotaManager.ts      # 配額追蹤
+│   ├── mcp/                 # MCP 整合
+│   │   └── client.ts        # MCP 客戶端
+│   ├── types/               # TypeScript 型別
+│   │   ├── config.ts        # 設定型別
+│   │   ├── session.ts       # 工作階段型別
+│   │   ├── tool.ts          # 工具型別
+│   │   └── permission.ts    # 權限型別
+│   ├── config.ts            # 設定載入器
+│   └── index.ts             # 進入點
+├── tests/                   # 測試套件
+├── docs/                    # 文件
+├── config/                  # 設定檔
+├── data/                    # 執行時期資料
+│   └── users.json          # 使用者權限
+├── logs/                    # 日誌檔案
+├── mcp-servers/            # MCP 伺服器設定
+├── start.sh                # 啟動腳本
+├── stop.sh                 # 停止腳本
+├── status.sh               # 狀態檢查腳本
+├── .env.example            # 環境範本
+├── package.json            # 相依性
+├── tsconfig.json           # TypeScript 設定
+├── README.md               # 主要文件
+├── TESTING_GUIDE.md        # 測試指南
+├── OPTIMIZATION.md         # 最佳化指南
+└── PROJECT_SUMMARY.md      # 本檔案
 ```
 
-## Features Implemented
+## 實作特性
 
-### 1. Core Bot Functionality
+### 1. 核心 Bot 功能
 
-- [x] Telegram bot integration with Grammy
-- [x] User authentication and authorization
-- [x] Session management per user
-- [x] Conversation history tracking
-- [x] Command handlers (/start, /help, /new, /pwd, /ls, /cd)
-- [x] Error handling and logging
-- [x] Background process management
+- [x] 使用 Grammy 的 Telegram Bot 整合
+- [x] 使用者驗證與授權
+- [x] 每位使用者的工作階段管理
+- [x] 對話歷程追蹤
+- [x] 指令處理器 (/start、/help、/new、/pwd、/ls、/cd)
+- [x] 錯誤處理與日誌記錄
+- [x] 背景程序管理
 
-### 2. Gemini AI Integration
+### 2. Gemini AI 整合
 
-- [x] Google Gemini API client
-- [x] Function calling (tool execution)
-- [x] Multi-turn conversations
-- [x] Context preservation
-- [x] Automatic tool selection
-- [x] Tool result processing
+- [x] Google Gemini API 客戶端
+- [x] 函式呼叫 (工具執行)
+- [x] 多輪對話
+- [x] 內容保留
+- [x] 自動工具選擇
+- [x] 工具結果處理
 
-### 3. File Operations (7 tools)
+### 3. 檔案操作 (7 個工具)
 
-- [x] `read_file` - Read file contents
-- [x] `write_file` - Write/create files
-- [x] `append_file` - Append to files
-- [x] `delete_file` - Delete files
-- [x] `create_directory` - Create directories
-- [x] `move_file` - Move/rename files
-- [x] `copy_file` - Copy files
-- [x] `list_directory` - List directory contents
+- [x] `read_file` - 讀取檔案內容
+- [x] `write_file` - 寫入/建立檔案
+- [x] `append_file` - 附加到檔案
+- [x] `delete_file` - 刪除檔案
+- [x] `create_directory` - 建立目錄
+- [x] `move_file` - 移動/重新命名檔案
+- [x] `copy_file` - 複製檔案
+- [x] `list_directory` - 列出目錄內容
 
-### 4. Browser Automation (3 tools)
+### 4. 網頁瀏覽自動化 (3 個工具)
 
-- [x] `browse_url` - Navigate and extract webpage content
-- [x] `screenshot_url` - Capture webpage screenshots
-- [x] `extract_data` - Extract specific data using CSS selectors
-- [x] Playwright integration
-- [x] Headless browser support
-- [x] Timeout handling
+- [x] `browse_url` - 導航並抽取網頁內容
+- [x] `screenshot_url` - 擷取網頁螢幕截圖
+- [x] `extract_data` - 使用 CSS 選擇器抽取特定資料
+- [x] Playwright 整合
+- [x] 無頭瀏覽器支援
+- [x] 逾時處理
 
-### 5. AI Image Generation (1 tool)
+### 5. AI 圖片生成 (1 個工具)
 
-- [x] `generate_image` - Generate AI images with Gemini Imagen
-- [x] Nano Banana wrapper integration
-- [x] Google Cloud credentials support
-- [x] Base64 image handling
-- [x] Permission controls
+- [x] `generate_image` - 使用 Gemini Imagen 生成 AI 圖片
+- [x] Nano Banana 包裝器整合
+- [x] Google Cloud 憑證支援
+- [x] Base64 圖片處理
+- [x] 權限控制
 
-### 6. Document Analysis (1 tool)
+### 6. 文件分析 (1 個工具)
 
-- [x] `analyze_document` - Extract and analyze document content
-- [x] PDF support (pdf-parse)
-- [x] Word document support (mammoth)
-- [x] Text extraction and summarization
+- [x] `analyze_document` - 抽取與分析文件內容
+- [x] PDF 支援 (pdf-parse)
+- [x] Word 文件支援 (mammoth)
+- [x] 文字抽取與總結
 
-### 7. File Organization (1 tool)
+### 7. 檔案整理 (1 個工具)
 
-- [x] `organize_files` - Organize files by type
-- [x] Automatic directory creation
-- [x] File type categorization
-- [x] Summary reporting
+- [x] `organize_files` - 按類型整理檔案
+- [x] 自動建立目錄
+- [x] 檔案類型分類
+- [x] 摘要報告
 
-### 8. Web Research (1 tool)
+### 8. 網路研究 (1 個工具)
 
-- [x] `search_and_summarize` - Search web and create reports
-- [x] Multi-query support
-- [x] Content aggregation
-- [x] Markdown report generation
+- [x] `search_and_summarize` - 搜尋網路與建立報告
+- [x] 多查詢支援
+- [x] 內容彙總
+- [x] Markdown 報告生成
 
-### 9. Permission System
+### 9. 權限系統
 
-- [x] Two-tier permission model
-  - Auto-approve: Read operations
-  - Require confirmation: Write/destructive operations
-- [x] Inline keyboard confirmations
-- [x] 30-second timeout
-- [x] Path validation
-- [x] Security restrictions
+- [x] 雙層權限模型
+  - 自動批准：讀取操作
+  - 需要確認：寫入/破壞性操作
+- [x] 內聯鍵盤確認
+- [x] 30 秒逾時
+- [x] 路徑驗證
+- [x] 安全限制
 
-### 10. Security Features
+### 10. 安全特性
 
-- [x] Path traversal prevention
-- [x] Sensitive path blocking (.ssh/, .env, etc.)
-- [x] Allowed paths whitelist
-- [x] User authentication
-- [x] Input validation (Zod schemas)
-- [x] Safe file operations
+- [x] 路徑穿越防止
+- [x] 敏感路徑阻擋 (.ssh/、.env 等)
+- [x] 允許路徑白名單
+- [x] 使用者驗證
+- [x] 輸入驗證 (Zod 綱要)
+- [x] 安全檔案操作
 
-### 11. Quota Management
+### 11. 配額管理
 
-- [x] Request rate limiting (per hour)
-- [x] Token usage tracking (per day)
-- [x] Warning at 80% threshold
-- [x] Hard limit enforcement
-- [x] Configurable limits
+- [x] 請求速率限制 (每小時)
+- [x] Token 使用追蹤 (每天)
+- [x] 80% 閾值警告
+- [x] 硬限制強制執行
+- [x] 可設定限制
 
-### 12. MCP Integration
+### 12. MCP 整合
 
-- [x] MCP SDK integration
-- [x] MCP server connections
-- [x] Tool registration from MCP servers
-- [x] Error handling for MCP failures
+- [x] MCP SDK 整合
+- [x] MCP 伺服器連線
+- [x] 來自 MCP 伺服器的工具註冊
+- [x] MCP 失敗的錯誤處理
 
-### 13. Deployment & Operations
+### 13. 部署與操作
 
-- [x] Start script with health checks
-- [x] Stop script with graceful shutdown
-- [x] Status script with metrics
-- [x] Process ID (PID) management
-- [x] Log file management
-- [x] Background execution
+- [x] 具有健康檢查的啟動腳本
+- [x] 具有優雅關閉的停止腳本
+- [x] 具有指標的狀態腳本
+- [x] 程序 ID (PID) 管理
+- [x] 日誌檔案管理
+- [x] 背景執行
 
-### 14. Documentation
+### 14. 文件
 
-- [x] Comprehensive README
-- [x] Environment setup guide
-- [x] API documentation
-- [x] Testing guide (manual)
-- [x] Optimization guide
-- [x] Project summary (this file)
-- [x] Task implementation summaries
-- [x] Troubleshooting guides
+- [x] 完整的 README
+- [x] 環境設定指南
+- [x] API 文件
+- [x] 測試指南 (手動)
+- [x] 最佳化指南
+- [x] 專案摘要 (本檔案)
+- [x] 工作實作摘要
+- [x] 故障排除指南
 
-## Technology Stack
+## 技術堆疊
 
-### Runtime & Framework
+### 執行時期與框架
 
-- **Runtime:** Bun 1.0+ (or Node.js 18+)
-- **Language:** TypeScript 5.3+
-- **Bot Framework:** Grammy 1.21+
+- **執行時期：** Bun 1.0+ (或 Node.js 18+)
+- **語言：** TypeScript 5.3+
+- **Bot 框架：** Grammy 1.21+
 
-### APIs & Services
+### API 與服務
 
-- **AI Model:** Google Gemini 2.0 Flash Exp
-- **Image Generation:** Gemini Imagen (Nano Banana)
-- **Browser Automation:** Playwright 1.41+
-- **MCP Protocol:** @modelcontextprotocol/sdk 1.0+
+- **AI 模型：** Google Gemini 2.0 Flash Exp
+- **圖片生成：** Gemini Imagen (Nano Banana)
+- **網頁瀏覽自動化：** Playwright 1.41+
+- **MCP 協定：** @modelcontextprotocol/sdk 1.0+
 
-### Document Processing
+### 文件處理
 
-- **PDF:** pdf-parse 1.1+
-- **Word:** mammoth 1.6+
+- **PDF：** pdf-parse 1.1+
+- **Word：** mammoth 1.6+
 
-### Utilities
+### 公用工具
 
-- **Validation:** Zod 3.22+
-- **Logging:** Winston 3.11+
-- **Configuration:** dotenv 16.4+
+- **驗證：** Zod 3.22+
+- **日誌記錄：** Winston 3.11+
+- **設定：** dotenv 16.4+
 
-### Development Tools
+### 開發工具
 
-- **Type Checking:** TypeScript compiler
-- **Package Manager:** Bun (or npm)
-- **Version Control:** Git
+- **型別檢查：** TypeScript 編譯器
+- **套件管理器：** Bun (或 npm)
+- **版本控制：** Git
 
-## Architecture
+## 架構
 
-### Design Patterns
+### 設計模式
 
-1. **Modular Architecture**
-   - Separation of concerns
-   - High cohesion, low coupling
-   - Clear module boundaries
+1. **模組化架構**
+   - 關注點分離
+   - 高內聚性、低耦合度
+   - 清晰的模組邊界
 
-2. **Tool Registry Pattern**
-   - Dynamic tool registration
-   - Centralized tool management
-   - Extensible design
+2. **工具註冊表模式**
+   - 動態工具註冊
+   - 集中式工具管理
+   - 可擴展設計
 
-3. **Middleware Pattern**
-   - Authentication middleware
-   - Session middleware
-   - Composable request processing
+3. **中間件模式**
+   - 驗證中間件
+   - 工作階段中間件
+   - 可組合的請求處理
 
-4. **Strategy Pattern**
-   - Different permission strategies (auto vs confirm)
-   - Tool execution strategies
-   - File type handling strategies
+4. **策略模式**
+   - 不同的權限策略 (自動 vs 確認)
+   - 工具執行策略
+   - 檔案類型處理策略
 
-5. **Factory Pattern**
-   - Tool creation
-   - Browser context creation
-   - MCP client creation
+5. **工廠模式**
+   - 工具建立
+   - 瀏覽器內容建立
+   - MCP 客戶端建立
 
-### Key Principles
+### 關鍵原則
 
-- **Immutability:** No object mutation, always return new objects
-- **Type Safety:** Strict TypeScript, runtime validation with Zod
-- **Error Handling:** Comprehensive try-catch, graceful degradation
-- **Small Functions:** Functions < 50 lines, single responsibility
-- **No Magic:** Constants defined, no hardcoded values
-- **Security First:** Input validation, path restrictions, permissions
+- **不可變性：** 無物件變動，總是傳回新物件
+- **型別安全：** 嚴格 TypeScript、使用 Zod 的執行時期驗證
+- **錯誤處理：** 完整的 try-catch、優雅降級
+- **小型函數：** 函數 < 50 行、單一責任
+- **無魔術：** 定義的常數、無硬編碼值
+- **安全優先：** 輸入驗證、路徑限制、權限
 
-### Data Flow
+### 資料流程
 
 ```
-User Message
+使用者訊息
     ↓
 Telegram API
     ↓
-Grammy Handler
+Grammy 處理器
     ↓
-Auth Middleware → (reject if unauthorized)
+驗證中間件 → (拒絕未授權)
     ↓
-Session Middleware → (load/create session)
+工作階段中間件 → (載入/建立工作階段)
     ↓
-Message Handler
+訊息處理器
     ↓
-Gemini Client → (process with context)
+Gemini 客戶端 → (透過內容處理)
     ↓
-Function Calling → (if tools needed)
+函式呼叫 → (若需要工具)
     ↓
-Permission Manager → (request approval if needed)
+權限管理器 → (如需要，請求批准)
     ↓
-Tool Execution → (execute approved tools)
+工具執行 → (執行已批准的工具)
     ↓
-Result Processing → (send back to Gemini)
+結果處理 → (傳回 Gemini)
     ↓
-Response Generation
+回應生成
     ↓
-Send to User
+傳送給使用者
 ```
 
-## Development Timeline
+## 開發時間表
 
-### Phase 1: Foundation (Tasks 1-5)
-- Project setup
-- Basic bot integration
-- Gemini client
-- File operation tools
-- Permission system
+### 階段 1：基礎 (工作 1-5)
+- 專案設定
+- 基本 Bot 整合
+- Gemini 客戶端
+- 檔案操作工具
+- 權限系統
 
-### Phase 2: Advanced Features (Tasks 6-10)
-- MCP integration
-- Image generation
-- Browser automation
-- Enhanced tools
+### 階段 2：進階特性 (工作 6-10)
+- MCP 整合
+- 圖片生成
+- 網頁瀏覽自動化
+- 增強工具
 
-### Phase 3: Specialized Tools (Tasks 11-15)
-- File organization
-- Document analysis
-- Web research
-- Quota management
-- Deployment scripts
+### 階段 3：特殊工具 (工作 11-15)
+- 檔案整理
+- 文件分析
+- 網路研究
+- 配額管理
+- 部署腳本
 
-### Phase 4: Finalization (Task 16)
-- Testing documentation
-- Optimization guide
-- Project summary
-- Final validation
+### 階段 4：最終化 (工作 16)
+- 測試文件
+- 最佳化指南
+- 專案摘要
+- 最終驗證
 
-## Completed Tasks
+## 完成的工作
 
-1. ✅ Task 1: 專案初始化與環境設定
-2. ✅ Task 2: 建立 Telegram Bot 基本連接
-3. ✅ Task 3: 整合 Google Gemini API
-4. ✅ Task 4: 實作檔案操作工具
-5. ✅ Task 5: 實作權限系統
-6. ✅ Task 6: 整合 MCP (Model Context Protocol)
-7. ✅ Task 7: 實作 AI 圖片生成工具
-8. ✅ Task 8: 實作 Playwright 瀏覽器自動化
-9. ✅ Task 9: 整合工具到 Telegram Bot
-10. ✅ Task 10: 完成 README 文件
-11. ✅ Task 11: 實作檔案組織工具
-12. ✅ Task 12: 實作文件分析工具
-13. ✅ Task 13: 實作研究報告生成工具
-14. ✅ Task 14: 實作配額管理系統
-15. ✅ Task 15: 加強部署腳本
-16. ✅ Task 16: 整合測試與優化
+1. ✅ 工作 1：專案初始化與環境設定
+2. ✅ 工作 2：建立 Telegram Bot 基本連線
+3. ✅ 工作 3：整合 Google Gemini API
+4. ✅ 工作 4：實作檔案操作工具
+5. ✅ 工作 5：實作權限系統
+6. ✅ 工作 6：整合 MCP (Model Context Protocol)
+7. ✅ 工作 7：實作 AI 圖片生成工具
+8. ✅ 工作 8：實作 Playwright 網頁瀏覽自動化
+9. ✅ 工作 9：整合工具到 Telegram Bot
+10. ✅ 工作 10：完成 README 文件
+11. ✅ 工作 11：實作檔案整理工具
+12. ✅ 工作 12：實作文件分析工具
+13. ✅ 工作 13：實作研究報告生成工具
+14. ✅ 工作 14：實作配額管理系統
+15. ✅ 工作 15：強化部署腳本
+16. ✅ 工作 16：整合測試與最佳化
 
-**Total Tasks Completed:** 16/16 (100%)
+**完成工作總數：** 16/16 (100%)
 
-## Key Achievements
+## 關鍵成就
 
-### Technical Excellence
+### 技術卓越
 
-- **Type Safety:** 100% TypeScript with strict mode
-- **Error Handling:** All async operations protected
-- **Security:** Multi-layer security (auth, paths, permissions)
-- **Code Quality:** Small functions, immutable patterns
-- **Documentation:** Comprehensive guides and examples
+- **型別安全：** 100% TypeScript 且嚴格模式
+- **錯誤處理：** 所有非同步操作受保護
+- **安全性：** 多層安全 (驗證、路徑、權限)
+- **程式碼品質：** 小型函數、不可變模式
+- **文件：** 完整的指南與範例
 
-### Feature Completeness
+### 特性完整性
 
-- **12 Tools:** Covering files, browser, AI, documents, research
-- **3 Permission Tiers:** Read, write, AI operations
-- **Quota System:** Request and token limits
-- **MCP Support:** Extensible with MCP servers
-- **Production Ready:** Deployment scripts and monitoring
+- **12 個工具：** 涵蓋檔案、瀏覽器、AI、文件、研究
+- **3 個權限層級：** 讀取、寫入、AI 操作
+- **配額系統：** 請求與 Token 限制
+- **MCP 支援：** 可使用 MCP 伺服器擴展
+- **生產就緒：** 部署腳本與監控
 
-### User Experience
+### 使用者體驗
 
-- **Simple Commands:** Intuitive command interface
-- **Natural Language:** Conversational AI interaction
-- **Clear Feedback:** Detailed error messages and confirmations
-- **Permission Control:** User approval for sensitive operations
-- **Persistent State:** Session and directory management
+- **簡單指令：** 直觀的指令介面
+- **自然語言：** 對話式 AI 互動
+- **清晰回饋：** 詳細的錯誤訊息與確認
+- **權限控制：** 使用者批准敏感操作
+- **持久狀態：** 工作階段與目錄管理
 
-## Usage Statistics (Example)
+## 使用統計 (範例)
 
-Based on typical usage patterns:
+根據典型使用模式：
 
-### Common Commands
-- `/start` - Initial setup
-- `/help` - Feature discovery
-- `/new` - Context reset
-- `/ls` - Directory browsing
-- `/cd` - Navigation
+### 常見指令
+- `/start` - 初始設定
+- `/help` - 發現特性
+- `/new` - 內容重設
+- `/ls` - 目錄瀏覽
+- `/cd` - 導航
 
-### Popular Tools
-1. `read_file` - Most frequent (auto-approved)
-2. `list_directory` - Directory exploration
-3. `browse_url` - Web research
-4. `write_file` - Content creation
-5. `screenshot_url` - Visual capture
+### 熱門工具
+1. `read_file` - 最常使用 (自動批准)
+2. `list_directory` - 目錄探索
+3. `browse_url` - 網路研究
+4. `write_file` - 內容建立
+5. `screenshot_url` - 視覺擷取
 
-### Permission Approval Rate
-- ~95% approval rate for write operations
-- <5% denied operations
-- ~2% timeout (no response)
+### 權限批准率
+- 寫入操作的 ~95% 批准率
+- < 5% 拒絕操作
+- ~2% 逾時 (無回應)
 
-## Performance Characteristics
+## 效能特性
 
-### Response Times
-- Simple queries: 1-2 seconds
-- File operations: 0.5-1 second
-- Browser operations: 3-6 seconds
-- Image generation: 10-15 seconds
-- Document analysis: 2-4 seconds
+### 回應時間
+- 簡單查詢：1-2 秒
+- 檔案操作：0.5-1 秒
+- 網頁瀏覽操作：3-6 秒
+- 圖片生成：10-15 秒
+- 文件分析：2-4 秒
 
-### Resource Usage
-- Base memory: 50-80 MB
-- Peak memory: 200-300 MB (with browser)
-- CPU: Low (idle), Medium (processing)
-- Network: Depends on AI API calls
+### 資源使用量
+- 基礎記憶體：50-80 MB
+- 尖峰記憶體：200-300 MB (含瀏覽器)
+- CPU：低 (閒置)、中等 (處理中)
+- 網路：取決於 AI API 呼叫
 
-### Scalability
-- Current: Single instance, ~10-20 concurrent users
-- Potential: Multi-instance with shared state (100+ users)
+### 可擴展性
+- 目前：單一實例、~10-20 個並行使用者
+- 潛力：多實例共享狀態 (100+ 使用者)
 
-## Security Posture
+## 安全態勢
 
-### Implemented Protections
+### 實作的保護
 
-1. **Authentication:** User whitelist
-2. **Path Security:** Traversal prevention, sensitive blocking
-3. **Input Validation:** Zod schemas, type checking
-4. **Permissions:** Explicit approval for destructive ops
-5. **Quota Limits:** Prevent abuse and cost overruns
+1. **驗證：** 使用者白名單
+2. **路徑安全：** 穿越防止、敏感阻擋
+3. **輸入驗證：** Zod 綱要、型別檢查
+4. **權限：** 破壞性操作的明確批准
+5. **配額限制：** 防止濫用與成本超支
 
-### Security Considerations
+### 安全考量
 
-- No SQL injection (no SQL database)
-- No XSS (server-side only)
-- File system isolation (allowed paths)
-- API key protection (env variables)
-- No credential storage (user data only)
+- 無 SQL 隱碼 (無 SQL 資料庫)
+- 無 XSS (僅伺服器端)
+- 檔案系統隔離 (允許路徑)
+- API 金鑰保護 (環境變數)
+- 無憑證儲存 (僅使用者資料)
 
-### Potential Risks
+### 潛在風險
 
-- Gemini API costs (mitigated by quotas)
-- File system access (mitigated by path validation)
-- Browser automation overhead (mitigated by cleanup)
+- Gemini API 成本 (由配額減緩)
+- 檔案系統存取 (由路徑驗證減緩)
+- 網頁瀏覽自動化負荷 (由清理減緩)
 
-## Dependencies
+## 相依性
 
-### Production Dependencies (8)
+### 生產相依性 (8)
 
 ```json
 {
-  "grammy": "^1.21.1",                    // Telegram bot framework
+  "grammy": "^1.21.1",                    // Telegram Bot 框架
   "@google/generative-ai": "^0.21.0",     // Gemini API
-  "@modelcontextprotocol/sdk": "^1.0.4",  // MCP protocol
-  "zod": "^3.22.4",                       // Schema validation
-  "winston": "^3.11.0",                   // Logging
-  "dotenv": "^16.4.1",                    // Environment config
-  "pdf-parse": "^1.1.1",                  // PDF processing
-  "mammoth": "^1.6.0",                    // Word documents
-  "playwright": "^1.41.2"                 // Browser automation
+  "@modelcontextprotocol/sdk": "^1.0.4",  // MCP 協定
+  "zod": "^3.22.4",                       // 綱要驗證
+  "winston": "^3.11.0",                   // 日誌記錄
+  "dotenv": "^16.4.1",                    // 環境設定
+  "pdf-parse": "^1.1.1",                  // PDF 處理
+  "mammoth": "^1.6.0",                    // Word 文件
+  "playwright": "^1.41.2"                 // 網頁瀏覽自動化
 }
 ```
 
-### Development Dependencies (3)
+### 開發相依性 (3)
 
 ```json
 {
-  "@types/node": "^20.11.16",   // Node.js types
-  "typescript": "^5.3.3",       // TypeScript compiler
-  "bun-types": "latest"         // Bun runtime types
+  "@types/node": "^20.11.16",   // Node.js 型別
+  "typescript": "^5.3.3",       // TypeScript 編譯器
+  "bun-types": "latest"         // Bun 執行時期型別
 }
 ```
 
-## Configuration
+## 設定
 
-### Environment Variables (13+)
+### 環境變數 (13+)
 
-**Required:**
-- `TELEGRAM_BOT_TOKEN` - Telegram Bot API token
-- `TELEGRAM_ALLOWED_USERS` - Authorized user IDs
-- `GOOGLE_API_KEY` - Google Gemini API key
+**必需：**
+- `TELEGRAM_BOT_TOKEN` - Telegram Bot API Token
+- `TELEGRAM_ALLOWED_USERS` - 授權使用者 ID
+- `GOOGLE_API_KEY` - Google Gemini API 金鑰
 
-**Optional:**
-- `GEMINI_DEFAULT_MODEL` - AI model selection
-- `ALLOWED_PATHS` - File access paths
-- `DEFAULT_WORKING_DIR` - Starting directory
-- `MAX_REQUESTS_PER_HOUR` - Request limit
-- `MAX_TOKENS_PER_DAY` - Token limit
-- `BROWSER_HEADLESS` - Browser mode
-- `BROWSER_TIMEOUT` - Operation timeout
-- `GOOGLE_APPLICATION_CREDENTIALS` - Image generation auth
+**選擇性：**
+- `GEMINI_DEFAULT_MODEL` - AI 模型選擇
+- `ALLOWED_PATHS` - 檔案存取路徑
+- `DEFAULT_WORKING_DIR` - 起始目錄
+- `MAX_REQUESTS_PER_HOUR` - 請求限制
+- `MAX_TOKENS_PER_DAY` - Token 限制
+- `BROWSER_HEADLESS` - 瀏覽器模式
+- `BROWSER_TIMEOUT` - 操作逾時
+- `GOOGLE_APPLICATION_CREDENTIALS` - 圖片生成驗證
 
-## Known Limitations
+## 已知限制
 
-1. **Single Instance:** No distributed deployment (yet)
-2. **In-Memory State:** Sessions lost on restart
-3. **Manual Testing:** No automated test suite
-4. **Quota Reset:** Manual reset only (no automatic)
-5. **MCP Servers:** Require external setup
-6. **Image Generation:** Requires Google Cloud credentials
+1. **單一實例：** 無分散式部署 (尚未)
+2. **記憶體內狀態：** 重新啟動時工作階段遺失
+3. **手動測試：** 無自動化測試套件
+4. **配額重設：** 僅手動重設 (無自動)
+5. **MCP 伺服器：** 需要外部設定
+6. **圖片生成：** 需要 Google Cloud 憑證
 
-## Future Enhancements
+## 未來增強
 
-### High Priority
-1. Browser instance pooling
-2. Unit and integration tests
-3. Monitoring and metrics
-4. Session persistence (database)
+### 高優先級
+1. 網頁瀏覽器實例池
+2. 單元與整合測試
+3. 監控與指標
+4. 工作階段持久化 (資料庫)
 
-### Medium Priority
-5. Response caching
-6. Parallel tool execution
-7. Streaming responses
-8. Rate limiting per user
+### 中優先級
+5. 回應快取
+6. 平行工具執行
+7. 串流回應
+8. 每位使用者的速率限制
 
-### Low Priority
-9. Multi-instance support
-10. Conversation history search
-11. Command autocomplete
-12. Advanced inline keyboards
+### 低優先級
+9. 多實例支援
+10. 對話歷程搜尋
+11. 指令自動完成
+12. 進階內聯鍵盤
 
-See [OPTIMIZATION.md](OPTIMIZATION.md) for detailed roadmap.
+參見 [OPTIMIZATION.md](OPTIMIZATION.md) 以取得詳細的路線圖。
 
-## Contributing
+## 貢獻
 
-### Development Setup
+### 開發設定
 
 ```bash
-# Clone repository
+# 複製存放庫
 git clone <repo-url>
 cd gemini-telegram-bot
 
-# Install dependencies
+# 安裝相依性
 bun install
 npx playwright install chromium
 
-# Configure environment
+# 設定環境
 cp .env.example .env
-# Edit .env with your credentials
+# 使用您的憑證編輯 .env
 
-# Run in development
+# 在開發中執行
 bun run dev
 
-# Type check
+# 型別檢查
 bun run typecheck
 
-# Run tests (when available)
+# 執行測試 (當可用時)
 bun test
 ```
 
-### Code Guidelines
+### 程式碼指南
 
-- Follow immutable patterns (no mutations)
-- Keep functions small (<50 lines)
-- Use TypeScript strict mode
-- Validate inputs with Zod
-- Handle all errors with try-catch
-- Write descriptive commit messages
-- Document public APIs
+- 遵循不可變模式 (無變動)
+- 保持函數小型 (<50 行)
+- 使用 TypeScript 嚴格模式
+- 使用 Zod 驗證輸入
+- 使用 try-catch 處理所有錯誤
+- 編寫描述性提交訊息
+- 記錄公開 API
 
-### Contribution Areas
+### 貢獻領域
 
-- Add more tools (calendar, email, etc.)
-- Improve error messages
-- Add automated tests
-- Performance optimizations
-- Documentation improvements
-- Bug fixes
+- 新增更多工具 (日曆、電子郵件等)
+- 改進錯誤訊息
+- 新增自動化測試
+- 效能最佳化
+- 文件改進
+- 錯誤修復
 
-## Support & Resources
+## 支援與資源
 
-### Documentation
-- [README.md](README.md) - Main documentation
-- [TESTING_GUIDE.md](TESTING_GUIDE.md) - Manual testing
-- [OPTIMIZATION.md](OPTIMIZATION.md) - Performance guide
-- Task summaries in repository
+### 文件
+- [README.md](README.md) - 主要文件
+- [TESTING_GUIDE.md](TESTING_GUIDE.md) - 手動測試
+- [OPTIMIZATION.md](OPTIMIZATION.md) - 效能指南
+- 存放庫中的工作摘要
 
-### External Resources
-- [Grammy Documentation](https://grammy.dev/)
+### 外部資源
+- [Grammy 文件](https://grammy.dev/)
 - [Google Gemini API](https://ai.google.dev/)
-- [Playwright Docs](https://playwright.dev/)
-- [MCP Protocol](https://modelcontextprotocol.io/)
+- [Playwright 文件](https://playwright.dev/)
+- [MCP 協定](https://modelcontextprotocol.io/)
 
-### Getting Help
-- Check documentation first
-- Review test files for examples
-- Check bot logs (`cat bot.log`)
-- Open GitHub issue with details
+### 取得協助
+- 先檢查文件
+- 查看測試檔案以取得範例
+- 檢查 Bot 日誌 (`cat bot.log`)
+- 使用詳細資訊開啟 GitHub 問題
 
-## License
+## 授權
 
-MIT License - See LICENSE file for details.
+MIT 授權 - 詳見 LICENSE 檔案。
 
-## Acknowledgments
+## 致謝
 
-### Technologies
-- **Grammy** - Excellent Telegram bot framework
-- **Google Gemini** - Powerful AI model with function calling
-- **Playwright** - Reliable browser automation
-- **Bun** - Fast and modern JavaScript runtime
-- **TypeScript** - Type safety and better DX
+### 技術
+- **Grammy** - 優質的 Telegram Bot 框架
+- **Google Gemini** - 功能強大的具有函式呼叫的 AI 模型
+- **Playwright** - 可靠的網頁瀏覽自動化
+- **Bun** - 快速且現代的 JavaScript 執行時期
+- **TypeScript** - 型別安全與更佳的開發人員體驗
 
-### Inspiration
-- Model Context Protocol (MCP) for tool integration pattern
-- Claude Desktop for AI assistant UX inspiration
-- Various Telegram bot examples for best practices
+### 靈感
+- Model Context Protocol (MCP) 作為工具整合模式
+- Claude Desktop 作為 AI 助手 UX 靈感
+- 各種 Telegram Bot 範例作為最佳實踐
 
-## Project Completion
+## 專案完成
 
-**Status:** ✅ COMPLETE
+**狀態：** ✅ 完成
 
-All 16 planned tasks have been successfully implemented:
-- ✅ Core functionality (bot, AI, tools)
-- ✅ Advanced features (browser, image, MCP)
-- ✅ Specialized tools (docs, research, organization)
-- ✅ Operations (deployment, quota, monitoring)
-- ✅ Documentation (guides, summaries, testing)
+所有 16 個計劃工作已成功實作：
+- ✅ 核心功能 (Bot、AI、工具)
+- ✅ 進階特性 (瀏覽器、圖片、MCP)
+- ✅ 特殊工具 (文件、研究、整理)
+- ✅ 操作 (部署、配額、監控)
+- ✅ 文件 (指南、摘要、測試)
 
-**Version:** 0.1.0 (Production Ready)
-**Date Completed:** 2026-01-29
-**Total Development Time:** ~16 tasks over continuous development
+**版本：** 0.1.0 (生產環境就緒)
+**完成日期：** 2026-01-29
+**總開發時間：** 持續開發期間約 16 個工作
 
 ---
 
-**Next Steps:**
-1. Deploy to production environment
-2. Monitor usage and performance
-3. Gather user feedback
-4. Implement priority optimizations
-5. Add automated testing
-6. Plan version 0.2.0 features
+**後續步驟：**
+1. 部署到生產環境
+2. 監控使用與效能
+3. 蒐集使用者回饋
+4. 實作優先級最佳化
+5. 新增自動化測試
+6. 規劃版本 0.2.0 特性
 
-**Project Success Criteria:** ✅ All Met
-- [x] All tools implemented and working
-- [x] Security measures in place
-- [x] Documentation complete
-- [x] Production deployment ready
-- [x] Testing guide available
-- [x] Optimization roadmap defined
+**專案成功標準：** ✅ 全部達成
+- [x] 所有工具實作且正常運作
+- [x] 安全措施已就位
+- [x] 文件完整
+- [x] 生產部署就緒
+- [x] 測試指南可用
+- [x] 最佳化路線圖已定義
 
-**Conclusion:**
+**結論：**
 
-The Gemini Telegram Bot is a production-ready, feature-complete AI-powered assistant with:
-- 12 functional tools covering files, browser, AI, and research
-- Robust security and permission system
-- Comprehensive documentation
-- Production deployment scripts
-- Clear optimization path forward
+Gemini Telegram Bot 是一個生產環境就緒、特性完整的 AI 驅動助手，具備：
+- 12 個涵蓋檔案、瀏覽器、AI 與研究的功能工具
+- 強大的安全與權限系統
+- 完整的文件
+- 生產部署腳本
+- 清晰的最佳化前進路徑
 
-Ready for real-world usage and continuous improvement.
+已準備好用於真實世界使用與持續改進。

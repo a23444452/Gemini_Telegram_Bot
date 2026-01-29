@@ -1,116 +1,116 @@
-# Optimization Guide
+# 最佳化指南
 
-Performance optimizations, best practices, and future improvement recommendations for the Gemini Telegram Bot.
+Gemini Telegram Bot 的效能最佳化、最佳實踐和未來改進建議。
 
-## Implemented Optimizations
+## 已實施的最佳化
 
-### 1. Code Architecture
+### 1. 程式碼架構
 
-#### Modular Design
-**Status:** ✅ Implemented
+#### 模組化設計
+**狀態：** ✅ 已實施
 
-- Code organized into logical modules (bot/, gemini/, tools/, permissions/)
-- High cohesion, low coupling
-- Easy to test and maintain
-- Each file has a single, clear responsibility
+- 程式碼組織成邏輯模組（bot/、gemini/、tools/、permissions/）
+- 高內聚力、低耦合
+- 易於測試和維護
+- 每個檔案都有單一、清晰的責任
 
-**Benefits:**
-- Faster development and debugging
-- Easier to add new features
-- Better code reusability
+**優點：**
+- 加快開發和偵錯速度
+- 更容易新增新功能
+- 更好的程式碼可重用性
 
-#### Immutable Patterns
-**Status:** ✅ Implemented
+#### 不可變模式
+**狀態：** ✅ 已實施
 
-- All data structures use immutable patterns
-- No direct object mutation
-- Functions return new objects instead of modifying existing ones
+- 所有資料結構使用不可變模式
+- 無直接物件變動
+- 函數返回新物件而不是修改現有物件
 
-**Example:**
+**範例：**
 ```typescript
-// Session updates create new objects
+// 工作階段更新建立新物件
 return {
   ...session,
   workingDirectory: newPath
 }
 ```
 
-**Benefits:**
-- Prevents unexpected side effects
-- Easier to reason about state changes
-- Better for debugging and testing
+**優點：**
+- 防止意外副作用
+- 更容易理解狀態變更
+- 更好的偵錯和測試
 
-### 2. Performance Optimizations
+### 2. 效能最佳化
 
-#### Lazy Loading
-**Status:** ✅ Implemented
+#### 延遲載入
+**狀態：** ✅ 已實施
 
-- Playwright browsers loaded only when needed
-- MCP connections established on-demand
-- Tools registered dynamically
+- Playwright 瀏覽器僅在需要時載入
+- MCP 連接按需建立
+- 工具動態註冊
 
-**Benefits:**
-- Faster bot startup time
-- Lower memory usage when features not used
-- Better resource utilization
+**優點：**
+- 更快的機器人啟動時間
+- 未使用功能時的較低記憶體使用
+- 更好的資源利用
 
-#### Resource Cleanup
-**Status:** ✅ Implemented
+#### 資源清理
+**狀態：** ✅ 已實施
 
-- Browser contexts closed after each operation
-- Temporary files cleaned up
-- Connection pooling for MCP clients
+- 每次操作後關閉瀏覽器內容
+- 臨時檔案被清理
+- MCP 客戶端連接池
 
-**Code Example:**
+**程式碼範例：**
 ```typescript
 const context = await browser.newContext()
 try {
-  // Use context
+  // 使用 context
 } finally {
-  await context.close() // Always cleanup
+  await context.close() // 始終清理
 }
 ```
 
-**Benefits:**
-- No memory leaks
-- Consistent performance over time
-- Better resource management
+**優點：**
+- 無記憶體洩漏
+- 隨著時間保持一致效能
+- 更好的資源管理
 
-#### Quota Management
-**Status:** ✅ Implemented
+#### 配額管理
+**狀態：** ✅ 已實施
 
-- Token usage tracked per request
-- Request limits enforced (hourly/daily)
-- Warning at 80% threshold
+- 追蹤每個請求的令牌使用
+- 執行請求限制（每小時/每天）
+- 在 80% 閾值時警告
 
-**Benefits:**
-- Prevents API cost overruns
-- Fair usage across users
-- Predictable operating costs
+**優點：**
+- 防止 API 成本超支
+- 跨使用者的公平使用
+- 可預測的營運成本
 
-### 3. Security Optimizations
+### 3. 安全性最佳化
 
-#### Path Validation
-**Status:** ✅ Implemented
+#### 路徑驗證
+**狀態：** ✅ 已實施
 
-- All file paths validated before access
-- Path traversal prevention
-- Sensitive paths blocked (.ssh, .env, etc.)
-- Allowed paths whitelist
+- 存取前驗證所有檔案路徑
+- 路徑遍歷預防
+- 敏感路徑被阻止（.ssh、.env 等）
+- 允許路徑白名單
 
-**Benefits:**
-- Prevents unauthorized file access
-- Protects sensitive data
-- Reduces security vulnerabilities
+**優點：**
+- 防止未授權的檔案存取
+- 保護敏感資料
+- 減少安全漏洞
 
-#### Input Validation
-**Status:** ✅ Implemented
+#### 輸入驗證
+**狀態：** ✅ 已實施
 
-- All user inputs validated with Zod schemas
-- Type safety enforced at runtime
-- Invalid inputs rejected early
+- 所有使用者輸入使用 Zod 模式驗證
+- 在執行階段執行類型安全
+- 早期拒絕無效輸入
 
-**Code Example:**
+**程式碼範例：**
 ```typescript
 const FileOperationParamsSchema = z.object({
   path: z.string().min(1),
@@ -118,278 +118,278 @@ const FileOperationParamsSchema = z.object({
 })
 ```
 
-**Benefits:**
-- Prevents injection attacks
-- Better error messages
-- Type safety guarantees
+**優點：**
+- 防止注入攻擊
+- 更好的錯誤訊息
+- 類型安全保證
 
-#### Permission System
-**Status:** ✅ Implemented
+#### 權限系統
+**狀態：** ✅ 已實施
 
-- Two-tier permission system (auto-approve vs require confirmation)
-- Read operations auto-approved
-- Write/destructive operations require confirmation
-- 30-second timeout for confirmations
+- 兩層權限系統（自動批准 vs 需要確認）
+- 讀取操作自動批准
+- 寫入/破壞性操作需要確認
+- 確認的 30 秒逾時
 
-**Benefits:**
-- Prevents accidental data loss
-- User control over destructive operations
-- Clear security boundaries
+**優點：**
+- 防止意外資料遺失
+- 使用者對破壞性操作的控制
+- 清晰的安全邊界
 
-### 4. Error Handling
+### 4. 錯誤處理
 
-#### Comprehensive Try-Catch
-**Status:** ✅ Implemented
+#### 全面的 Try-Catch
+**狀態：** ✅ 已實施
 
-- All async operations wrapped in try-catch
-- Errors logged with context
-- User-friendly error messages
+- 所有非同步操作被 try-catch 包裝
+- 使用內容記錄錯誤
+- 對使用者友善的錯誤訊息
 
-**Benefits:**
-- Bot remains stable on errors
-- Better debugging with logs
-- Clear feedback to users
+**優點：**
+- 機器人在錯誤時保持穩定
+- 更好的日誌偵錯
+- 清晰的使用者回饋
 
-#### Graceful Degradation
-**Status:** ✅ Implemented
+#### 優雅降級
+**狀態：** ✅ 已實施
 
-- MCP server failures don't crash bot
-- Browser automation errors handled gracefully
-- Missing dependencies detected and reported
+- MCP 伺服器故障不會使機器人崩潰
+- 瀏覽器自動化錯誤優雅處理
+- 偵測並報告遺失的相依套件
 
-**Benefits:**
-- High availability
-- Better user experience
-- Partial functionality maintained
+**優點：**
+- 高可用性
+- 更好的使用者體驗
+- 部分功能維持
 
-### 5. Code Quality
+### 5. 程式碼品質
 
-#### TypeScript Strict Mode
-**Status:** ✅ Implemented
+#### TypeScript 嚴格模式
+**狀態：** ✅ 已實施
 
-- Strict type checking enabled
-- No implicit any types
-- Null safety enforced
+- 啟用嚴格類型檢查
+- 無隱含任何類型
+- 強制執行空安全
 
-**Benefits:**
-- Catch errors at compile time
-- Better IDE support
-- Self-documenting code
+**優點：**
+- 在編譯時捕捉錯誤
+- 更好的 IDE 支援
+- 自我說明的程式碼
 
-#### Small Functions
-**Status:** ✅ Implemented
+#### 小函式
+**狀態：** ✅ 已實施
 
-- Functions kept under 50 lines
-- Single responsibility principle
-- Clear function names
+- 函式保持在 50 行以下
+- 單一責任原則
+- 清晰的函式名稱
 
-**Benefits:**
-- Easier to test
-- Better readability
-- Simpler maintenance
+**優點：**
+- 更容易測試
+- 更好的可讀性
+- 更簡單的維護
 
-#### No Magic Numbers
-**Status:** ✅ Implemented
+#### 無魔法數字
+**狀態：** ✅ 已實施
 
-- Constants defined in config
-- Environment variables for configuration
-- Clear naming for all values
+- 常數在配置中定義
+- 環境變數用於配置
+- 所有值的清晰命名
 
-**Example:**
+**範例：**
 ```typescript
-const DEFAULT_TIMEOUT = 30000 // 30 seconds
+const DEFAULT_TIMEOUT = 30000 // 30 秒
 const QUOTA_WARNING_THRESHOLD = 0.8 // 80%
 ```
 
-**Benefits:**
-- Easy to adjust behavior
-- Self-documenting code
-- Centralized configuration
+**優點：**
+- 易於調整行為
+- 自我說明的程式碼
+- 集中式配置
 
-## Performance Metrics
+## 效能指標
 
-### Current Performance (Estimated)
+### 目前效能（估計）
 
-| Operation | Average Time | Notes |
+| 操作 | 平均時間 | 備註 |
 |-----------|--------------|-------|
-| Bot startup | 2-3 seconds | Includes dependency loading |
-| Simple message | 1-2 seconds | Direct Gemini response |
-| File read | 0.5-1 second | Local file system access |
-| File write | 0.5-1 second | Includes permission prompt |
-| Browser browse | 3-5 seconds | Depends on website |
-| Screenshot | 4-6 seconds | Includes page load + render |
-| Image generation | 10-15 seconds | Depends on Imagen API |
-| Document analysis | 2-4 seconds | Depends on file size |
+| 機器人啟動 | 2-3 秒 | 包括相依套件載入 |
+| 簡單訊息 | 1-2 秒 | 直接 Gemini 回應 |
+| 檔案讀取 | 0.5-1 秒 | 本地檔案系統存取 |
+| 檔案寫入 | 0.5-1 秒 | 包括權限提示 |
+| 瀏覽器瀏覽 | 3-5 秒 | 取決於網站 |
+| 螢幕截圖 | 4-6 秒 | 包括頁面載入 + 呈現 |
+| 圖片生成 | 10-15 秒 | 取決於 Imagen API |
+| 文件分析 | 2-4 秒 | 取決於檔案大小 |
 
-### Memory Usage
+### 記憶體使用
 
-- Base memory: ~50-80 MB
-- With browser: +100-150 MB per context
-- Peak memory: ~200-300 MB (with active browser)
+- 基本記憶體：~50-80 MB
+- 帶瀏覽器：+100-150 MB（每個內容）
+- 峰值記憶體：~200-300 MB（帶活躍瀏覽器）
 
-### API Quota Usage
+### API 配額使用
 
-- Average message: ~1000-2000 tokens
-- Function calling: +500-1000 tokens overhead
-- Image generation: Separate quota (not token-based)
+- 平均訊息：~1000-2000 個令牌
+- 函式呼叫：+500-1000 個令牌開銷
+- 圖片生成：單獨配額（非基於令牌）
 
-## Future Optimization Opportunities
+## 未來的最佳化機會
 
-### 1. Caching
+### 1. 快取
 
-#### Browser Page Cache
-**Priority:** Medium
-**Effort:** Low
+#### 瀏覽器頁面快取
+**優先級：** 中等
+**工作量：** 低
 
-**Implementation:**
+**實施：**
 ```typescript
 const pageCache = new Map<string, { page: Page, timestamp: number }>()
 
 async function getCachedPage(url: string): Promise<Page> {
   const cached = pageCache.get(url)
   if (cached && Date.now() - cached.timestamp < 5 * 60 * 1000) {
-    return cached.page // Reuse within 5 minutes
+    return cached.page // 在 5 分鐘內重用
   }
-  // Otherwise create new page
+  // 否則建立新頁面
 }
 ```
 
-**Benefits:**
-- Faster repeated browsing
-- Reduced API calls
-- Better response time
+**優點：**
+- 更快的重複瀏覽
+- 減少 API 呼叫
+- 更好的回應時間
 
-**Considerations:**
-- Cache invalidation strategy
-- Memory limits
-- Stale data handling
+**注意事項：**
+- 快取失效策略
+- 記憶體限制
+- 過期資料處理
 
-#### Gemini Response Cache
-**Priority:** Low
-**Effort:** Medium
+#### Gemini 回應快取
+**優先級：** 低
+**工作量：** 中等
 
-**Implementation:**
-- Cache identical queries
-- Time-based invalidation (1 hour)
-- User-specific cache keys
+**實施：**
+- 快取相同查詢
+- 基於時間的失效（1 小時）
+- 使用者特定的快取鍵
 
-**Benefits:**
-- Faster responses for repeated questions
-- Reduced API costs
-- Lower quota usage
+**優點：**
+- 重複問題的更快回應
+- 減少 API 成本
+- 較低的配額使用
 
-**Considerations:**
-- Privacy concerns (user data)
-- Cache size limits
-- Freshness requirements
+**注意事項：**
+- 隱私考慮（使用者資料）
+- 快取大小限制
+- 新鮮度要求
 
-### 2. Parallel Processing
+### 2. 並行處理
 
-#### Batch File Operations
-**Priority:** High
-**Effort:** Medium
+#### 批量檔案操作
+**優先級：** 高
+**工作量：** 中等
 
-**Implementation:**
+**實施：**
 ```typescript
-// Process multiple files in parallel
+// 並行處理多個檔案
 const results = await Promise.all(
   files.map(file => processFile(file))
 )
 ```
 
-**Benefits:**
-- Faster bulk operations
-- Better CPU utilization
-- Improved user experience
+**優點：**
+- 更快的批量操作
+- 更好的 CPU 利用
+- 改進的使用者體驗
 
-**Use Cases:**
-- File organization
-- Batch document analysis
-- Multiple screenshot capture
+**使用案例：**
+- 檔案組織
+- 批量文件分析
+- 多個螢幕截圖捕捉
 
-#### Concurrent Tool Execution
-**Priority:** Medium
-**Effort:** High
+#### 並行工具執行
+**優先級：** 中等
+**工作量：** 高
 
-**Implementation:**
-- Allow multiple tools to run simultaneously
-- Queue system for resource-intensive operations
-- Parallel execution for independent tasks
+**實施：**
+- 允許多個工具同時執行
+- 資源密集型操作的佇列系統
+- 獨立任務的並行執行
 
-**Benefits:**
-- Faster complex queries
-- Better throughput
-- Improved responsiveness
+**優點：**
+- 更快的複雜查詢
+- 更好的輸送量
+- 改進的回應性
 
-**Considerations:**
-- Resource limits (browser instances)
-- Race conditions
-- Error handling complexity
+**注意事項：**
+- 資源限制（瀏覽器實例）
+- 競爭條件
+- 錯誤處理複雜性
 
-### 3. Resource Management
+### 3. 資源管理
 
-#### Browser Instance Pooling
-**Priority:** High
-**Effort:** Medium
+#### 瀏覽器實例池
+**優先級：** 高
+**工作量：** 中等
 
-**Current:** New browser context per request
-**Proposed:** Reuse browser instances across requests
+**目前：** 每個請求的新瀏覽器內容
+**建議：** 跨請求重用瀏覽器實例
 
-**Implementation:**
+**實施：**
 ```typescript
 class BrowserPool {
   private browsers: Browser[] = []
   private maxBrowsers = 3
 
   async getContext(): Promise<BrowserContext> {
-    // Reuse existing browser or create new one
-    // Limit total browsers to maxBrowsers
+    // 重用現有瀏覽器或建立新的
+    // 將總瀏覽器限制為 maxBrowsers
   }
 }
 ```
 
-**Benefits:**
-- Faster browser operations
-- Lower memory overhead
-- Better resource utilization
+**優點：**
+- 更快的瀏覽器操作
+- 較低的記憶體開銷
+- 更好的資源利用
 
-**Considerations:**
-- Context isolation (security)
-- Cleanup strategy
-- Maximum pool size
+**注意事項：**
+- 內容隔離（安全性）
+- 清理策略
+- 最大池大小
 
-#### Streaming Responses
-**Priority:** Low
-**Effort:** High
+#### 流式傳輸回應
+**優先級：** 低
+**工作量：** 高
 
-**Current:** Wait for complete Gemini response
-**Proposed:** Stream partial responses to user
+**目前：** 等待完整 Gemini 回應
+**建議：** 將部分回應流式傳輸給使用者
 
-**Benefits:**
-- Faster perceived response time
-- Better user experience for long responses
-- Can show progress
+**優點：**
+- 更快的感知回應時間
+- 長回應的更好使用者體驗
+- 可顯示進度
 
-**Considerations:**
-- Telegram API limitations
-- Complex implementation
-- Error handling mid-stream
+**注意事項：**
+- Telegram API 限制
+- 複雜的實施
+- 中途流式傳輸的錯誤處理
 
-### 4. Database Integration
+### 4. 資料庫整合
 
-#### Session Persistence
-**Priority:** Medium
-**Effort:** Medium
+#### 工作階段持續性
+**優先級：** 中等
+**工作量：** 中等
 
-**Current:** In-memory session storage
-**Proposed:** Database-backed sessions (SQLite/Redis)
+**目前：** 記憶體中的工作階段儲存
+**建議：** 資料庫支援的工作階段（SQLite/Redis）
 
-**Benefits:**
-- Sessions survive bot restarts
-- Better multi-instance support
-- Historical data analysis
+**優點：**
+- 機器人重啟後工作階段存活
+- 更好的多實例支援
+- 歷史資料分析
 
-**Implementation:**
+**實施：**
 ```typescript
 interface SessionStore {
   get(userId: number): Promise<UserSession | null>
@@ -398,38 +398,38 @@ interface SessionStore {
 }
 ```
 
-**Considerations:**
-- Database choice (SQLite for simple, Redis for distributed)
-- Migration strategy
-- Backup and recovery
+**注意事項：**
+- 資料庫選擇（簡單用 SQLite，分散式用 Redis）
+- 遷移策略
+- 備份和復原
 
-#### Conversation History
-**Priority:** Low
-**Effort:** High
+#### 對話歷史
+**優先級：** 低
+**工作量：** 高
 
-**Current:** Limited in-memory history
-**Proposed:** Full conversation history in database
+**目前：** 有限的記憶體中歷史
+**建議：** 資料庫中的完整對話歷史
 
-**Benefits:**
-- Long-term context
-- Analytics and insights
-- User conversation search
+**優點：**
+- 長期內容
+- 分析和見解
+- 使用者對話搜尋
 
-**Considerations:**
-- Storage costs
-- Privacy (data retention policies)
-- Query performance
+**注意事項：**
+- 儲存成本
+- 隱私（資料保留政策）
+- 查詢效能
 
-### 5. Monitoring & Observability
+### 5. 監控與可觀測性
 
-#### Structured Logging
-**Priority:** High
-**Effort:** Low
+#### 結構化日誌
+**優先級：** 高
+**工作量：** 低
 
-**Current:** Winston logging to file
-**Proposed:** Structured JSON logs with log levels
+**目前：** Winston 日誌至檔案
+**建議：** 使用日誌級別的結構化 JSON 日誌
 
-**Implementation:**
+**實施：**
 ```typescript
 logger.info('Tool executed', {
   userId: session.userId,
@@ -439,41 +439,41 @@ logger.info('Tool executed', {
 })
 ```
 
-**Benefits:**
-- Better log analysis
-- Easier debugging
-- Performance monitoring
+**優點：**
+- 更好的日誌分析
+- 更容易偵錯
+- 效能監控
 
-**Tools:**
-- Winston (already used, enhance format)
-- Log aggregation (future: ELK stack, Datadog)
+**工具：**
+- Winston（已使用，增強格式）
+- 日誌聚合（未來：ELK stack、Datadog）
 
-#### Metrics Collection
-**Priority:** Medium
-**Effort:** Medium
+#### 指標收集
+**優先級：** 中等
+**工作量：** 中等
 
-**Metrics to Track:**
-- Request latency (p50, p95, p99)
-- Error rates by tool
-- Quota usage over time
-- Tool usage frequency
-- User activity patterns
+**要追蹤的指標：**
+- 請求延遲（p50、p95、p99）
+- 按工具的錯誤率
+- 配額使用隨時間
+- 工具使用頻率
+- 使用者活動模式
 
-**Implementation:**
-- In-memory metrics collector
-- Periodic export to monitoring service
-- Dashboard for visualization
+**實施：**
+- 記憶體中的指標收集器
+- 定期匯出到監控服務
+- 視覺化的儀表板
 
-**Benefits:**
-- Performance insights
-- Usage patterns
-- Proactive issue detection
+**優點：**
+- 效能見解
+- 使用模式
+- 主動式問題偵測
 
-#### Health Checks
-**Priority:** High
-**Effort:** Low
+#### 健康檢查
+**優先級：** 高
+**工作量：** 低
 
-**Implementation:**
+**實施：**
 ```typescript
 app.get('/health', (req, res) => {
   res.json({
@@ -489,90 +489,90 @@ app.get('/health', (req, res) => {
 })
 ```
 
-**Benefits:**
-- Monitor bot health
-- Automated alerting
-- Integration with monitoring tools
+**優點：**
+- 監控機器人健康
+- 自動警報
+- 與監控工具整合
 
-### 6. Testing Improvements
+### 6. 測試改進
 
-#### Unit Test Coverage
-**Priority:** High
-**Effort:** High
+#### 單位測試涵蓋
+**優先級：** 高
+**工作量：** 高
 
-**Current:** Minimal tests
-**Target:** 80%+ coverage
+**目前：** 最少測試
+**目標：** 80%+ 涵蓋
 
-**Focus Areas:**
-- Tool execution logic
-- Permission validation
-- Path security
-- Quota calculations
+**重點領域：**
+- 工具執行邏輯
+- 權限驗證
+- 路徑安全
+- 配額計算
 
-**Benefits:**
-- Catch regressions early
-- Safer refactoring
-- Better code quality
+**優點：**
+- 及早捕捉回歸
+- 更安全的重構
+- 更好的程式碼品質
 
-#### Integration Tests
-**Priority:** Medium
-**Effort:** High
+#### 整合測試
+**優先級：** 中等
+**工作量：** 高
 
-**Tests to Add:**
-- End-to-end command flows
-- Tool execution with real APIs (mocked)
-- Permission system workflows
-- Error scenarios
+**要新增的測試：**
+- 端到端命令流
+- 使用真實 API（模擬）的工具執行
+- 權限系統工作流
+- 錯誤情境
 
-**Benefits:**
-- Confidence in deployments
-- Automated QA
-- Prevent production issues
+**優點：**
+- 部署的信心
+- 自動化 QA
+- 防止生產問題
 
-#### Performance Tests
-**Priority:** Low
-**Effort:** Medium
+#### 效能測試
+**優先級：** 低
+**工作量：** 中等
 
-**Tests:**
-- Load testing (concurrent users)
-- Stress testing (quota limits)
-- Memory leak detection
-- Response time benchmarks
+**測試：**
+- 負載測試（並行使用者）
+- 壓力測試（配額限制）
+- 記憶體洩漏偵測
+- 回應時間基準
 
-**Benefits:**
-- Prevent performance regressions
-- Capacity planning
-- Optimization validation
+**優點：**
+- 防止效能回歸
+- 容量規劃
+- 最佳化驗證
 
-### 7. Scalability
+### 7. 可擴展性
 
-#### Multi-Instance Support
-**Priority:** Low
-**Effort:** High
+#### 多實例支援
+**優先級：** 低
+**工作量：** 高
 
-**Current:** Single bot instance
-**Proposed:** Multiple instances with shared state
+**目前：** 單一機器人實例
+**建議：** 具有共用狀態的多個實例
 
-**Requirements:**
-- Shared session storage (Redis)
-- Distributed quota tracking
-- Load balancing
+**要求：**
+- 共用工作階段儲存（Redis）
+- 分散式配額追蹤
+- 負載平衡
 
-**Benefits:**
-- Handle more users
-- High availability
-- Better performance
+**優點：**
+- 處理更多使用者
+- 高可用性
+- 更好的效能
 
-**Considerations:**
-- Complexity increase
-- Infrastructure costs
-- Coordination overhead
+**注意事項：**
+- 複雜性增加
+- 基礎設施成本
+- 協調開銷
 
-#### Rate Limiting
-**Priority:** Medium
-**Effort:** Low
+#### 速率限制
+**優先級：** 中等
+**工作量：** 低
 
-**Implementation:**
+**實施：**
 ```typescript
 class RateLimiter {
   private requests: Map<number, number[]> = new Map()
@@ -586,151 +586,151 @@ class RateLimiter {
 }
 ```
 
-**Benefits:**
-- Prevent abuse
-- Fair resource allocation
-- API protection
+**優點：**
+- 防止濫用
+- 公平的資源分配
+- API 保護
 
-### 8. User Experience
+### 8. 使用者體驗
 
-#### Command Autocomplete
-**Priority:** Low
-**Effort:** Medium
+#### 命令自動完成
+**優先級：** 低
+**工作量：** 中等
 
-**Implementation:**
-- Register bot commands with Telegram
-- Show command list in chat input
-- Include parameter hints
+**實施：**
+- 使用 Telegram 註冊機器人命令
+- 在聊天輸入中顯示命令清單
+- 包括參數提示
 
-**Benefits:**
-- Easier discoverability
-- Reduced user errors
-- Better UX
+**優點：**
+- 更容易發現
+- 減少使用者錯誤
+- 更好的 UX
 
-#### Progress Indicators
-**Priority:** Medium
-**Effort:** Low
+#### 進度指示器
+**優先級：** 中等
+**工作量：** 低
 
-**Implementation:**
+**實施：**
 ```typescript
-await ctx.sendChatAction('typing') // Show typing indicator
-await ctx.sendChatAction('upload_photo') // Show upload indicator
+await ctx.sendChatAction('typing') // 顯示輸入指示器
+await ctx.sendChatAction('upload_photo') // 顯示上傳指示器
 ```
 
-**Benefits:**
-- Better perceived performance
-- User knows bot is working
-- Reduced repeat requests
+**優點：**
+- 更好的感知效能
+- 使用者知道機器人正在工作
+- 減少重複請求
 
-#### Inline Keyboards
-**Priority:** Low
-**Effort:** Medium
+#### 內嵌鍵盤
+**優先級：** 低
+**工作量：** 中等
 
-**Use Cases:**
-- Quick file operations (delete/rename)
-- Browse directory with buttons
-- Tool selection menu
+**使用案例：**
+- 快速檔案操作（刪除/重新命名）
+- 使用按鈕瀏覽目錄
+- 工具選擇菜單
 
-**Benefits:**
-- Faster interactions
-- Better mobile experience
-- Reduced typing
+**優點：**
+- 更快的互動
+- 更好的行動體驗
+- 減少輸入
 
-## Optimization Checklist
+## 最佳化檢查清單
 
-Before each release:
+在每次發行前：
 
-- [ ] Run TypeScript type check (`bun run typecheck`)
-- [ ] Check for console.log statements
-- [ ] Review error handling coverage
-- [ ] Test on fresh environment
-- [ ] Verify all environment variables documented
-- [ ] Check for hardcoded values
-- [ ] Review security configurations
-- [ ] Test with quota limits
-- [ ] Verify all file paths validated
-- [ ] Check for memory leaks (long-running test)
-- [ ] Review log output (check for sensitive data)
-- [ ] Test permission prompts
-- [ ] Verify browser cleanup
+- [ ] 執行 TypeScript 類型檢查（`bun run typecheck`）
+- [ ] 檢查 console.log 語句
+- [ ] 檢查錯誤處理涵蓋
+- [ ] 在新鮮環境上測試
+- [ ] 驗證所有環境變數已記錄
+- [ ] 檢查硬編碼值
+- [ ] 檢查安全配置
+- [ ] 使用配額限制測試
+- [ ] 驗證所有檔案路徑已驗證
+- [ ] 檢查記憶體洩漏（長時間執行測試）
+- [ ] 檢查日誌輸出（檢查敏感資料）
+- [ ] 測試權限提示
+- [ ] 驗證瀏覽器清理
 
-## Performance Tuning
+## 效能調整
 
-### Environment Variables
+### 環境變數
 
-Adjust these for optimal performance:
+調整這些以獲得最佳效能：
 
 ```bash
-# Browser
-BROWSER_HEADLESS=true          # Use headless mode (faster)
-BROWSER_TIMEOUT=30000          # 30 seconds (adjust for slow sites)
+# 瀏覽器
+BROWSER_HEADLESS=true          # 使用無頭模式（更快）
+BROWSER_TIMEOUT=30000          # 30 秒（為慢速網站調整）
 
-# Quota (adjust based on usage patterns)
-MAX_REQUESTS_PER_HOUR=100      # Prevent abuse
-MAX_TOKENS_PER_DAY=1000000     # Control costs
+# 配額（根據使用模式調整）
+MAX_REQUESTS_PER_HOUR=100      # 防止濫用
+MAX_TOKENS_PER_DAY=1000000     # 控制成本
 
-# Model selection
-GEMINI_DEFAULT_MODEL=gemini-2.0-flash-exp  # Fast model
-# Consider gemini-pro for better quality (slower)
+# 模型選擇
+GEMINI_DEFAULT_MODEL=gemini-2.0-flash-exp  # 快速模型
+# 考慮 gemini-pro 以獲得更好的品質（更慢）
 ```
 
-### System Resources
+### 系統資源
 
-Recommended system specs:
+建議的系統規格：
 
-- **Minimum:** 512MB RAM, 1 CPU core
-- **Recommended:** 2GB RAM, 2 CPU cores
-- **Disk:** 500MB for dependencies + logs
+- **最低：** 512MB RAM、1 CPU 核心
+- **建議：** 2GB RAM、2 CPU 核心
+- **磁碟：** 500MB 用於相依套件 + 日誌
 
-For production:
-- **Production:** 4GB RAM, 4 CPU cores
-- **Disk:** 2GB + log rotation
+對於生產環境：
+- **生產：** 4GB RAM、4 CPU 核心
+- **磁碟：** 2GB + 日誌輪轉
 
-## Monitoring Best Practices
+## 監控最佳實踐
 
-### Log Rotation
+### 日誌輪轉
 
 ```bash
-# Add to crontab for automatic log rotation
+# 新增到 crontab 以進行自動日誌輪轉
 0 0 * * * find /path/to/logs -name "*.log" -mtime +7 -delete
 ```
 
-### Metrics to Watch
+### 要監控的指標
 
-- Response time trends
-- Error rate by tool
-- Memory usage over time
-- Quota consumption patterns
-- User activity distribution
+- 回應時間趨勢
+- 按工具的錯誤率
+- 隨時間的記憶體使用
+- 配額消費模式
+- 使用者活動分佈
 
-### Alerting
+### 警報
 
-Set up alerts for:
-- Bot downtime
-- Error rate > 5%
-- Memory usage > 80%
-- Quota exhaustion
-- API failures
+設定警報以進行以下情況：
+- 機器人停機
+- 錯誤率 > 5%
+- 記憶體使用 > 80%
+- 配額耗盡
+- API 故障
 
-## Conclusion
+## 結論
 
-This bot is already optimized for:
-- Security (path validation, permissions)
-- Maintainability (modular code, TypeScript)
-- Reliability (error handling, cleanup)
-- Performance (lazy loading, resource management)
+此機器人已針對以下項目進行最佳化：
+- 安全性（路徑驗證、權限）
+- 可維護性（模組化程式碼、TypeScript）
+- 可靠性（錯誤處理、清理）
+- 效能（延遲載入、資源管理）
 
-Future optimizations should focus on:
-1. Testing coverage (highest priority)
-2. Monitoring and observability
-3. Browser instance pooling
-4. Caching strategies
-5. Scalability (when needed)
+未來的最佳化應側重於：
+1. 測試涵蓋（最高優先級）
+2. 監控和可觀測性
+3. 瀏覽器實例池
+4. 快取策略
+5. 可擴展性（如果需要）
 
-Most optimizations should be driven by:
-- Actual performance metrics
-- User feedback
-- Usage patterns
-- Cost analysis
+大多數最佳化應由以下因素驅動：
+- 實際效能指標
+- 使用者回饋
+- 使用模式
+- 成本分析
 
-Avoid premature optimization. Measure first, optimize later.
+避免過早最佳化。先測量，後最佳化。

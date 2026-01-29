@@ -1,152 +1,152 @@
-# Testing Image Generation Feature
+# 測試圖片生成功能
 
-## Quick Start
+## 快速開始
 
-### Prerequisites
+### 前置條件
 
-1. **Environment Variables** (already configured in `.env`):
+1. **環境變數**（已在 `.env` 中配置）：
    ```bash
    TELEGRAM_BOT_TOKEN=<your_token>
    GEMINI_API_KEY=<your_key>
    ```
 
-2. **Google Cloud Credentials** (for Nano Banana):
+2. **Google Cloud 認證**（用於 Nano Banana）：
    ```bash
-   # Set up default application credentials
+   # 設定預設應用程式認證
    gcloud auth application-default login
 
-   # OR set credentials file
+   # 或設定認證檔案
    export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"
    ```
 
-3. **Install Dependencies**:
+3. **安裝依賴**：
    ```bash
    npm install
    ```
 
-### Running the Bot
+### 執行 Bot
 
 ```bash
 npm start
 ```
 
-## Manual Testing
+## 手動測試
 
-### Test Case 1: Basic Image Generation
+### 測試案例 1：基本圖片生成
 
-1. **Send message to bot**:
+1. **傳送訊息到 bot**：
    ```
    請幫我生成一張可愛的小貓圖片
    ```
 
-2. **Expected behavior**:
-   - Bot sends confirmation request with "Approve" and "Reject" buttons
-   - Tool name: `generate_image`
-   - Shows prompt parameter
+2. **預期行為**：
+   - Bot 傳送確認要求，含有「核准」和「拒絕」按鈕
+   - 工具名稱：`generate_image`
+   - 顯示提示語參數
 
-3. **Click "Approve"**
+3. **點擊「核准」**
 
-4. **Expected result**:
-   - Message: "✅ 已允許"
-   - Wait 10-30 seconds
-   - Bot sends:
-     a. Text response from Gemini (e.g., "我已經生成了一張可愛的小貓圖片！")
-     b. Generated image of a cute cat
+4. **預期結果**：
+   - 訊息：「✅ 已允許」
+   - 等待 10-30 秒
+   - Bot 傳送：
+     a. 來自 Gemini 的文字回應（例如，「我已經生成了一張可愛的小貓圖片！」）
+     b. 生成的小貓圖片
 
-### Test Case 2: English Prompt
+### 測試案例 2：英文提示語
 
-1. **Send message**:
+1. **傳送訊息**：
    ```
    Generate a futuristic city with flying cars at sunset
    ```
 
-2. **Click "Approve"**
+2. **點擊「核准」**
 
-3. **Expected result**:
-   - Text response
-   - High-quality image matching the description
+3. **預期結果**：
+   - 文字回應
+   - 高品質圖片符合描述
 
-### Test Case 3: Permission Rejection
+### 測試案例 3：拒絕權限
 
-1. **Send message**:
+1. **傳送訊息**：
    ```
    Generate an image of a robot
    ```
 
-2. **Click "Reject"**
+2. **點擊「拒絕」**
 
-3. **Expected result**:
-   - Message: "❌ 已拒絕"
-   - Gemini responds that permission was denied
-   - No image generated
+3. **預期結果**：
+   - 訊息：「❌ 已拒絕」
+   - Gemini 回應權限遭拒
+   - 未生成圖片
 
-### Test Case 4: Complex Prompt
+### 測試案例 4：複雜提示語
 
-1. **Send message**:
+1. **傳送訊息**：
    ```
    Generate a serene Japanese garden with cherry blossoms, a stone bridge over a koi pond, and Mount Fuji in the background during golden hour
    ```
 
-2. **Click "Approve"**
+2. **點擊「核准」**
 
-3. **Expected result**:
-   - Detailed image matching all elements of the prompt
+3. **預期結果**：
+   - 詳細圖片符合提示語的所有元素
 
-## Checking Logs
+## 檢查日誌
 
-Watch the console output for debug information:
+監看主控台輸出以了解除錯資訊：
 
 ```bash
 npm start
 
-# Look for these log messages:
+# 查找以下日誌訊息：
 # [ImageGen] Generating image with prompt: <prompt>
 # [ImageGen] MCP tool response received
 # [ImageGen] Successfully generated image (<size> bytes base64)
 ```
 
-## Troubleshooting
+## 故障排除
 
-### Issue: "Image generation service not available"
+### 問題：「圖片生成服務不可用」
 
-**Solution**:
+**解決方案**：
 ```bash
-# Install nanobanana globally
+# 全域安裝 nanobanana
 npm install -g nanobanana
 
-# Test it works
+# 測試是否可用
 npx -y nanobanana
 ```
 
-### Issue: "Failed to extract image data from response"
+### 問題：「無法從回應中提取圖片資料」
 
-**Solution**:
-- Check Google Cloud credentials are configured
-- Verify Imagen API is enabled in your GCP project
-- Check you have quota/billing enabled
+**解決方案**：
+- 檢查 Google Cloud 認證是否已配置
+- 驗證 Imagen API 是否在您的 GCP 專案中啟用
+- 檢查是否已啟用配額/計費
 
-### Issue: MCP client connection error
+### 問題：MCP 用戶端連接錯誤
 
-**Solution**:
+**解決方案**：
 ```bash
-# Check Node.js version (should be 18+)
+# 檢查 Node.js 版本（應為 18+）
 node --version
 
-# Reinstall dependencies
+# 重新安裝依賴
 rm -rf node_modules
 npm install
 ```
 
-### Issue: Image not appearing in Telegram
+### 問題：圖片未在 Telegram 中顯示
 
-**Solution**:
-- Check console for "Error sending image"
-- Verify base64 data is valid
-- Ensure image size is under Telegram limits (10MB)
+**解決方案**：
+- 檢查主控台中是否有「錯誤傳送圖片」訊息
+- 驗證 base64 資料是否有效
+- 確保圖片大小未超過 Telegram 限制（10MB）
 
-## Expected Output Examples
+## 預期輸出範例
 
-### Console Output (Success)
+### 主控台輸出（成功）
 
 ```
 🚀 Starting Gemini Telegram Bot...
@@ -156,63 +156,63 @@ npm install
 [ImageGen] Successfully generated image (152837 bytes base64)
 ```
 
-### Console Output (Error)
+### 主控台輸出（錯誤）
 
 ```
 [ImageGen] Error generating image: Error: Failed to connect to MCP server
 Error sending message: Image generation service not available
 ```
 
-## Performance Metrics
+## 效能指標
 
-- **Cold start**: ~5-10 seconds (first time nanobanana downloads)
-- **Warm generation**: ~15-25 seconds per image
-- **Image size**: Typically 100-500 KB (base64: ~150-700 KB)
+- **冷啟動**：約 5-10 秒（首次 nanobanana 下載）
+- **暖啟動生成**：每張圖片約 15-25 秒
+- **圖片大小**：通常 100-500 KB（base64：約 150-700 KB）
 
-## Next Steps
+## 後續步驟
 
-After confirming image generation works:
+確認圖片生成可用後：
 
-1. Test with various prompt styles (realistic, cartoon, abstract)
-2. Test error handling (reject permission, invalid prompts)
-3. Test multiple consecutive generations
-4. Monitor Google Cloud usage/quotas
+1. 測試各種提示語風格（逼真、卡通、抽象）
+2. 測試錯誤處理（拒絕權限、無效提示語）
+3. 測試多次連續生成
+4. 監控 Google Cloud 使用量/配額
 
-## Quick Debug Commands
+## 快速除錯指令
 
 ```bash
-# Check if nanobanana is accessible
+# 檢查 nanobanana 是否可存取
 npx -y nanobanana --help
 
-# Verify TypeScript compilation
+# 驗證 TypeScript 編譯
 npx tsc --noEmit
 
-# Check bot token is valid
+# 檢查 bot token 是否有效
 curl https://api.telegram.org/bot<YOUR_TOKEN>/getMe
 
-# Test MCP client directly (create test script)
+# 直接測試 MCP 用戶端（建立測試腳本）
 node -e "console.log(require('./src/mcp/client'))"
 ```
 
-## Known Limitations
+## 已知限制
 
-1. **Single image per prompt**: Currently generates one image at a time
-2. **No caching**: Each request generates a new image
-3. **No quality controls**: Uses Imagen defaults
-4. **Synchronous**: Bot waits for generation to complete
+1. **每次提示一張圖片**：目前一次生成一張圖片
+2. **無快取**：每個請求都生成新圖片
+3. **無品質控制**：使用 Imagen 預設設定
+4. **同步**：Bot 等待生成完成
 
-## Success Criteria
+## 成功標準
 
-- ✅ Permission confirmation appears
-- ✅ User can approve/reject
-- ✅ Image generates within 30 seconds
-- ✅ Image appears in Telegram chat
-- ✅ Gemini provides contextual response
-- ✅ Error messages are user-friendly
-- ✅ Multiple generations work consecutively
+- ✅ 權限確認出現
+- ✅ 使用者可以核准/拒絕
+- ✅ 圖片在 30 秒內生成
+- ✅ 圖片出現在 Telegram 聊天中
+- ✅ Gemini 提供上下文相關回應
+- ✅ 錯誤訊息對使用者友善
+- ✅ 多次生成連續運行
 
 ---
 
-**Note**: If you encounter persistent issues with nanobanana, check:
+**注意**：如果遇到 nanobanana 的持續問題，請查看：
 - [Nano Banana GitHub Issues](https://github.com/gemini-cli-extensions/nanobanana/issues)
-- [MCP SDK Documentation](https://github.com/modelcontextprotocol/typescript-sdk)
+- [MCP SDK 文件](https://github.com/modelcontextprotocol/typescript-sdk)
