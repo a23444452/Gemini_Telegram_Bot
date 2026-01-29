@@ -19,9 +19,12 @@ const mockGetGenerativeModel = mock(() => ({
 
 mock.module('@google/generative-ai', () => ({
   GoogleGenerativeAI: class {
-    constructor(apiKey: string) {}
-    getGenerativeModel(config: any) {
-      return mockGetGenerativeModel(config)
+    constructor(_apiKey?: string) {}
+    getGenerativeModel(config?: any) {
+      mockGetGenerativeModel(config)
+      return {
+        startChat: mockStartChat
+      }
     }
   }
 }))
@@ -61,7 +64,7 @@ describe('GeminiClient', () => {
         response: {
           text: () => 'Hello from Gemini!'
         }
-      })
+      } as any)
 
       const response = await client.sendMessage(testUserId, 'Hello')
 
@@ -75,7 +78,7 @@ describe('GeminiClient', () => {
         response: {
           text: () => 'Response 1'
         }
-      })
+      } as any)
 
       await client.sendMessage(testUserId, 'Message 1')
 
@@ -104,7 +107,7 @@ describe('GeminiClient', () => {
         response: {
           text: () => 'New response'
         }
-      })
+      } as any)
 
       await client.sendMessage(testUserId, 'New message')
 

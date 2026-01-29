@@ -1,10 +1,26 @@
 import { createBot } from './bot/bot'
 import { handlePwd, handleLs, handleCd } from './bot/handlers/directory'
+import { config } from './config'
+import { GeminiClient } from './gemini/client'
+import { ToolRegistry } from './gemini/tools'
+import { readFileTool, listDirectoryTool } from './tools/fileOperations'
+import { sessionManager } from './bot/middleware/session'
 
 async function main() {
   console.log('🚀 Starting Gemini Telegram Bot...')
 
   const bot = createBot()
+
+  // Initialize Gemini client
+  const geminiClient = new GeminiClient(
+    config.gemini.apiKey,
+    config.gemini.defaultModel
+  )
+
+  // Initialize tool registry
+  const toolRegistry = new ToolRegistry()
+  toolRegistry.registerTool(readFileTool)
+  toolRegistry.registerTool(listDirectoryTool)
 
   // 基本指令
   bot.command('start', async (ctx) => {
@@ -28,14 +44,46 @@ async function main() {
 **進階功能**
 /status - 查看狀態
 /model <pro|flash> - 切換模型
+
+直接發送訊息即可與 Gemini 對話!
     `.trim()
     await ctx.reply(helpText)
+  })
+
+  bot.command('new', async (ctx) => {
+    if (!ctx.from) return
+
+    const userId = ctx.from.id
+    sessionManager.updateSession(userId, { geminiContext: [] })
+    await ctx.reply('🔄 已開始新對話')
   })
 
   // 工作目錄管理指令
   bot.command('pwd', handlePwd)
   bot.command('ls', handleLs)
   bot.command('cd', handleCd)
+
+  // 處理一般文字訊息 - 發送給 Gemini
+  bot.on('message:text', async (ctx) => {
+    if (!ctx.from) return
+
+    const userId = ctx.from.id
+    const messageText = ctx.message.text
+
+    // 忽略指令 (以 / 開頭)
+    if (messageText.startsWith('/')) {
+      return
+    }
+
+    try {
+      // 發送給 Gemini
+      const response = await geminiClient.sendMessage(userId, messageText)
+      await ctx.reply(response)
+    } catch (error) {
+      console.error('Error processing message:', error)
+      await ctx.reply(`❌ 處理訊息時發生錯誤: ${error instanceof Error ? error.message : '未知錯誤'}`)
+    }
+  })
 
   // 啟動 bot
   await bot.start()

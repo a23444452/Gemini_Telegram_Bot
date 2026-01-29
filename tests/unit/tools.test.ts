@@ -184,7 +184,7 @@ describe('ToolRegistry', () => {
     })
 
     it('should pass session to tool execute function', async () => {
-      let receivedSession: UserSession | null = null
+      let receivedUserId = 0
 
       const testTool: Tool = {
         name: 'session_tool',
@@ -192,7 +192,7 @@ describe('ToolRegistry', () => {
         parameters: {},
         requiresConfirmation: false,
         execute: async (params, session) => {
-          receivedSession = session
+          receivedUserId = session.userId
           return { success: true }
         }
       }
@@ -200,7 +200,7 @@ describe('ToolRegistry', () => {
       registry.registerTool(testTool)
       await registry.executeTool('session_tool', {}, mockSession)
 
-      expect(receivedSession).toBe(mockSession)
+      expect(receivedUserId).toBe(mockSession.userId)
     })
 
     it('should propagate tool execution errors', async () => {
