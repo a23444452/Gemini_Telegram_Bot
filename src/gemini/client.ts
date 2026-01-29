@@ -2,6 +2,7 @@ import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai'
 import { sessionManager } from '../bot/middleware/session'
 import type { GeminiMessage } from '../types/session'
 import type { ToolRegistry } from './tools'
+import { permissionManager } from '../permissions/permissionManager'
 
 /**
  * Client for interacting with Google Gemini API
@@ -42,7 +43,7 @@ export class GeminiClient {
     while (result.response.functionCalls && result.response.functionCalls().length > 0) {
       const functionCalls = result.response.functionCalls()
 
-      // Execute all function calls
+      // Execute all function calls with permission checks
       const functionResponses = await Promise.all(
         functionCalls.map(async (fc: any) => {
           if (!toolRegistry) {
@@ -52,6 +53,34 @@ export class GeminiClient {
             }
           }
 
+          const tool = toolRegistry.getTool(fc.name)
+          if (!tool) {
+            return {
+              name: fc.name,
+              response: { error: `Tool not found: ${fc.name}` }
+            }
+          }
+
+          // Check if permission confirmation is required
+          if (tool.requiresConfirmation) {
+            const approved = await permissionManager.requestConfirmation(
+              fc.name,
+              fc.args,
+              userId
+            )
+
+            if (!approved) {
+              return {
+                name: fc.name,
+                response: {
+                  success: false,
+                  error: 'User denied permission to execute this tool'
+                }
+              }
+            }
+          }
+
+          // Execute tool
           const toolResult = await toolRegistry.executeTool(fc.name, fc.args, session)
           return {
             name: fc.name,
