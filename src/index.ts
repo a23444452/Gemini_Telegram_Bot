@@ -5,12 +5,14 @@ import { GeminiClient } from './gemini/client'
 import { ToolRegistry } from './gemini/tools'
 import { InputFile } from 'grammy'
 import {
+  fileInfoTool,
   readFileTool,
   listDirectoryTool,
   writeFileTool,
   appendFileTool,
   deleteFileTool,
   createDirectoryTool,
+  deleteDirectoryTool,
   moveFileTool,
   copyFileTool
 } from './tools/fileOperations'
@@ -32,6 +34,7 @@ async function main() {
   const toolRegistry = new ToolRegistry()
 
   // Read-only tools
+  toolRegistry.registerTool(fileInfoTool)
   toolRegistry.registerTool(readFileTool)
   toolRegistry.registerTool(listDirectoryTool)
 
@@ -40,6 +43,7 @@ async function main() {
   toolRegistry.registerTool(appendFileTool)
   toolRegistry.registerTool(deleteFileTool)
   toolRegistry.registerTool(createDirectoryTool)
+  toolRegistry.registerTool(deleteDirectoryTool)
   toolRegistry.registerTool(moveFileTool)
   toolRegistry.registerTool(copyFileTool)
 

@@ -37,6 +37,10 @@ export function loadConfig(): Config {
       headless: process.env.BROWSER_HEADLESS !== 'false',
       timeout: parseInt(process.env.BROWSER_TIMEOUT || '30000', 10),
     },
+    fileLimits: {
+      maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '10485760', 10), // 10MB default
+      maxContentSize: parseInt(process.env.MAX_CONTENT_SIZE || '5242880', 10), // 5MB default
+    },
   }
 
   return ConfigSchema.parse(rawConfig)

@@ -22,6 +22,10 @@ export const ConfigSchema = z.object({
     headless: z.boolean(),
     timeout: z.number().int().positive(),
   }),
+  fileLimits: z.object({
+    maxFileSize: z.number().int().positive(),
+    maxContentSize: z.number().int().positive(),
+  }),
 })
 
 export type Config = z.infer<typeof ConfigSchema>

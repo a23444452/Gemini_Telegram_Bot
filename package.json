@@ -7,7 +7,8 @@
     "dev": "bun run src/index.ts",
     "start": "bun run src/index.ts",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "bunx playwright install chromium"
   },
   "keywords": ["telegram", "gemini", "mcp", "bot"],
   "author": "Vince Wang",

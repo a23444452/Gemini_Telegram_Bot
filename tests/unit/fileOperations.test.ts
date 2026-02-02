@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
 import {
+  fileInfoTool,
   readFileTool,
   listDirectoryTool,
   writeFileTool,
   appendFileTool,
   deleteFileTool,
   createDirectoryTool,
+  deleteDirectoryTool,
   moveFileTool,
   copyFileTool
 } from '../../src/tools/fileOperations'
@@ -46,6 +48,73 @@ describe('File Operations Tools', () => {
     } catch (error) {
       // Ignore cleanup errors
     }
+  })
+
+  describe('fileInfoTool', () => {
+    it('should get file information successfully', async () => {
+      const result = await fileInfoTool.execute({ path: 'test.txt' }, session)
+
+      expect(result.success).toBe(true)
+      expect(result.data).toBeDefined()
+      expect(result.data.type).toBe('file')
+      expect(result.data.name).toBe('test.txt')
+      expect(result.data.size).toBeGreaterThan(0)
+      expect(result.data.sizeHuman).toBeDefined()
+      expect(result.data.permissions).toBeDefined()
+      expect(result.data.timestamps).toBeDefined()
+      expect(result.data.timestamps.created).toBeDefined()
+      expect(result.data.timestamps.modified).toBeDefined()
+    })
+
+    it('should get directory information with item count', async () => {
+      const result = await fileInfoTool.execute({ path: 'subdir' }, session)
+
+      expect(result.success).toBe(true)
+      expect(result.data).toBeDefined()
+      expect(result.data.type).toBe('directory')
+      expect(result.data.name).toBe('subdir')
+      expect(result.data.itemCount).toBe(1) // Contains nested.txt
+    })
+
+    it('should format file size correctly', async () => {
+      // Create a file with known size
+      const testContent = 'x'.repeat(1500) // 1500 bytes
+      await fs.writeFile(path.join(testDir, 'sized.txt'), testContent)
+
+      const result = await fileInfoTool.execute({ path: 'sized.txt' }, session)
+
+      expect(result.success).toBe(true)
+      expect(result.data.size).toBe(1500)
+      expect(result.data.sizeHuman).toContain('KB')
+    })
+
+    it('should include permissions in both formats', async () => {
+      const result = await fileInfoTool.execute({ path: 'test.txt' }, session)
+
+      expect(result.success).toBe(true)
+      expect(result.data.permissions).toMatch(/^[r-][w-][x-][r-][w-][x-][r-][w-][x-]$/)
+      expect(result.data.permissionsOctal).toMatch(/^\d{3}$/)
+    })
+
+    it('should fail for non-existent path', async () => {
+      const result = await fileInfoTool.execute({ path: 'nonexistent.txt' }, session)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Failed to get file info')
+    })
+
+    it('should block access outside allowed paths', async () => {
+      const result = await fileInfoTool.execute({ path: '/etc/passwd' }, session)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('outside allowed paths')
+    })
+
+    it('should have correct metadata', () => {
+      expect(fileInfoTool.name).toBe('file_info')
+      expect(fileInfoTool.requiresConfirmation).toBe(false)
+      expect(fileInfoTool.parameters.required).toContain('path')
+    })
   })
 
   describe('readFileTool', () => {
@@ -97,6 +166,19 @@ describe('File Operations Tools', () => {
 
       expect(result.success).toBe(false)
       expect(result.error).toContain('outside allowed paths')
+    })
+
+    it('should reject reading files larger than the size limit', async () => {
+      // Create a file larger than 10MB (default limit)
+      const largeContent = 'x'.repeat(11 * 1024 * 1024) // 11MB
+      const largePath = path.join(testDir, 'large.txt')
+      await fs.writeFile(largePath, largeContent)
+
+      const result = await readFileTool.execute({ path: 'large.txt' }, session)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('File too large')
+      expect(result.error).toContain('max:')
     })
   })
 
@@ -231,6 +313,20 @@ describe('File Operations Tools', () => {
       const content = await fs.readFile(path.join(testDir, 'deep/nested/file.txt'), 'utf-8')
       expect(content).toBe('Deep content')
     })
+
+    it('should reject writing content larger than the size limit', async () => {
+      // Create content larger than 5MB (default limit)
+      const largeContent = 'x'.repeat(6 * 1024 * 1024) // 6MB
+
+      const result = await writeFileTool.execute(
+        { path: 'large-write.txt', content: largeContent },
+        session
+      )
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Content too large')
+      expect(result.error).toContain('max:')
+    })
   })
 
   describe('appendFileTool', () => {
@@ -266,6 +362,35 @@ describe('File Operations Tools', () => {
 
       expect(result.success).toBe(false)
       expect(result.error).toContain('outside allowed paths')
+    })
+
+    it('should reject appending content larger than the content size limit', async () => {
+      const largeContent = 'x'.repeat(6 * 1024 * 1024) // 6MB
+
+      const result = await appendFileTool.execute(
+        { path: 'append-test.txt', content: largeContent },
+        session
+      )
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Content too large')
+    })
+
+    it('should reject appending if resulting file would be too large', async () => {
+      // Create a file that's 9MB
+      const existingContent = 'x'.repeat(9 * 1024 * 1024)
+      await fs.writeFile(path.join(testDir, 'big-file.txt'), existingContent)
+
+      // Try to append 2MB more (would result in 11MB, over 10MB limit)
+      const appendContent = 'y'.repeat(2 * 1024 * 1024)
+
+      const result = await appendFileTool.execute(
+        { path: 'big-file.txt', content: appendContent },
+        session
+      )
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Resulting file would be too large')
     })
   })
 
@@ -335,6 +460,80 @@ describe('File Operations Tools', () => {
 
       expect(result.success).toBe(false)
       expect(result.error).toContain('outside allowed paths')
+    })
+  })
+
+  describe('deleteDirectoryTool', () => {
+    it('should delete empty directory successfully', async () => {
+      // Create an empty directory
+      const emptyDir = path.join(testDir, 'empty-dir')
+      await fs.mkdir(emptyDir)
+
+      const result = await deleteDirectoryTool.execute({ path: 'empty-dir' }, session)
+
+      expect(result.success).toBe(true)
+      expect(result.data).toContain('deleted successfully')
+
+      // Verify directory is deleted
+      await expect(fs.access(emptyDir)).rejects.toThrow()
+    })
+
+    it('should refuse to delete non-empty directory without recursive flag', async () => {
+      const result = await deleteDirectoryTool.execute({ path: 'subdir' }, session)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('not empty')
+      expect(result.error).toContain('recursive=true')
+    })
+
+    it('should delete non-empty directory with recursive=true', async () => {
+      // Create a directory with files
+      const testSubdir = path.join(testDir, 'to-delete')
+      await fs.mkdir(testSubdir)
+      await fs.writeFile(path.join(testSubdir, 'file1.txt'), 'content1')
+      await fs.writeFile(path.join(testSubdir, 'file2.txt'), 'content2')
+      await fs.mkdir(path.join(testSubdir, 'nested'))
+      await fs.writeFile(path.join(testSubdir, 'nested', 'file3.txt'), 'content3')
+
+      const result = await deleteDirectoryTool.execute(
+        { path: 'to-delete', recursive: true },
+        session
+      )
+
+      expect(result.success).toBe(true)
+
+      // Verify directory and all contents are deleted
+      await expect(fs.access(testSubdir)).rejects.toThrow()
+    })
+
+    it('should fail when trying to delete a file (not a directory)', async () => {
+      const result = await deleteDirectoryTool.execute({ path: 'test.txt' }, session)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('not a directory')
+    })
+
+    it('should fail when trying to delete non-existent directory', async () => {
+      const result = await deleteDirectoryTool.execute({ path: 'nonexistent-dir' }, session)
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Failed to delete directory')
+    })
+
+    it('should block delete outside allowed paths', async () => {
+      const result = await deleteDirectoryTool.execute(
+        { path: '/tmp/some-dir', recursive: true },
+        session
+      )
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('outside allowed paths')
+    })
+
+    it('should have correct metadata', () => {
+      expect(deleteDirectoryTool.name).toBe('delete_directory')
+      expect(deleteDirectoryTool.requiresConfirmation).toBe(true)
+      expect(deleteDirectoryTool.parameters.required).toContain('path')
     })
   })
 
@@ -488,6 +687,20 @@ describe('File Operations Tools', () => {
 
       expect(result.success).toBe(false)
       expect(result.error).toContain('outside allowed paths')
+    })
+
+    it('should reject copying files larger than the size limit', async () => {
+      // Create a large file (11MB)
+      const largeContent = 'x'.repeat(11 * 1024 * 1024)
+      await fs.writeFile(path.join(testDir, 'large-source.txt'), largeContent)
+
+      const result = await copyFileTool.execute(
+        { source: 'large-source.txt', destination: 'large-copy.txt' },
+        session
+      )
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain('Source file too large')
     })
   })
 

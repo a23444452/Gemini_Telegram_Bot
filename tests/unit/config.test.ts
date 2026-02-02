@@ -25,6 +25,10 @@ describe('Config', () => {
         headless: true,
         timeout: 30000,
       },
+      fileLimits: {
+        maxFileSize: 10485760,
+        maxContentSize: 5242880,
+      },
     }
 
     expect(() => ConfigSchema.parse(validConfig)).not.toThrow()

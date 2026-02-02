@@ -38,17 +38,9 @@ bun install
 npm install
 ```
 
-### 3. 安裝 Playwright 瀏覽器
+**注意**: Playwright 的 Chromium 瀏覽器會在安裝依賴項時自動下載 (透過 `postinstall` 腳本)。
 
-```bash
-# 安裝 Chromium 瀏覽器
-npx playwright install chromium
-
-# 或安裝所有瀏覽器
-npx playwright install
-```
-
-### 4. 設定環境變數
+### 3. 設定環境變數
 
 ```bash
 cp .env.example .env
@@ -153,11 +145,28 @@ tail -50 bot.log
 機器人: [呼叫 list_directory 工具]
 機器人: 當前目錄包含: ...
 
+使用者: 查看 report.pdf 的詳細資訊
+機器人: [呼叫 file_info 工具]
+機器人: 檔案資訊：
+     - 類型：檔案
+     - 大小：2.5 MB
+     - 權限：rw-r--r--
+     - 建立時間：2026-01-15
+     - 修改時間：2026-01-28
+
 使用者: 請建立一個 test.txt 檔案,內容為「Hello World」
 機器人: [請求確認]
 使用者: [點擊允許]
 機器人: [呼叫 write_file 工具]
 機器人: 檔案建立成功
+
+使用者: 刪除 old-project 目錄
+機器人: [請求確認]
+使用者: [點擊允許]
+機器人: 目錄包含 15 個項目,需要使用 recursive=true
+使用者: 確認遞迴刪除
+機器人: [呼叫 delete_directory 工具]
+機器人: 目錄已成功刪除
 
 使用者: 請生成一張可愛的小貓圖片
 機器人: [自動呼叫 generate_image 工具]
@@ -176,6 +185,7 @@ tail -50 bot.log
 
 #### 讀取操作 (自動執行)
 
+- `file_info` - 查看檔案或目錄詳細資訊 (大小、權限、時間戳記)
 - `read_file` - 讀取檔案內容
 - `list_directory` - 列出目錄內容
 
@@ -185,6 +195,7 @@ tail -50 bot.log
 - `append_file` - 附加內容到檔案
 - `delete_file` - 刪除檔案
 - `create_directory` - 建立目錄
+- `delete_directory` - 刪除目錄 (可選擇性遞迴刪除)
 - `move_file` - 移動或重新命名檔案
 - `copy_file` - 複製檔案
 
@@ -211,7 +222,7 @@ gemini-telegram-bot/
 │   │   ├── function-calling.ts  # 函式呼叫邏輯
 │   │   └── conversation.ts      # 對話管理
 │   ├── tools/            # 工具實作
-│   │   ├── fileOperations.ts    # 檔案操作工具
+│   │   ├── fileOperations.ts    # 檔案/目錄操作工具
 │   │   ├── imageGeneration.ts   # 圖片生成工具
 │   │   └── browser/      # 瀏覽器自動化工具
 │   │       ├── browse.ts # URL 瀏覽
@@ -245,6 +256,9 @@ gemini-telegram-bot/
 - 封鎖敏感檔案存取 (`.ssh/`、`.env` 等)
 - 使用者驗證 (只有 `ALLOWED_USERS` 可以使用機器人)
 - Token 使用量追蹤和配額限制
+- 檔案大小限制防止記憶體溢出
+  - 讀取/複製檔案最大 10MB (可設定)
+  - 寫入/附加內容最大 5MB (可設定)
 
 ## 疑難排解
 
@@ -299,13 +313,24 @@ cat bot.log | grep ImageGen
 
 ### 瀏覽器自動化失敗
 
+**常見錯誤：「缺少必要瀏覽器組件」**
+
+這通常表示 Playwright 瀏覽器未正確安裝。解決方式：
+
 ```bash
-# 如果尚未安裝,請安裝 Playwright 瀏覽器
-npx playwright install chromium
+# 手動安裝 Chromium 瀏覽器
+bunx playwright install chromium
 
 # 檢查瀏覽器是否正確安裝
-npx playwright install --dry-run
+bunx playwright install --dry-run
 
+# 驗證瀏覽器路徑存在
+ls -la ~/Library/Caches/ms-playwright/
+```
+
+**其他瀏覽器問題：**
+
+```bash
 # 若 headless 模式有問題,嘗試使用 headless=false
 # 在 .env 中設定:
 BROWSER_HEADLESS=false
@@ -313,6 +338,22 @@ BROWSER_HEADLESS=false
 # 針對載入慢的網站增加逾時時間 (毫秒)
 BROWSER_TIMEOUT=60000
 ```
+
+### 檔案大小限制錯誤
+
+如果遇到「檔案太大」或「內容太大」的錯誤：
+
+```bash
+# 在 .env 中調整檔案大小限制
+
+# 最大檔案讀取/複製大小 (預設: 10MB = 10485760 bytes)
+MAX_FILE_SIZE=20971520  # 增加到 20MB
+
+# 最大寫入/附加內容大小 (預設: 5MB = 5242880 bytes)
+MAX_CONTENT_SIZE=10485760  # 增加到 10MB
+```
+
+**注意：** 增加限制可能會導致記憶體使用增加。建議根據系統資源調整。
 
 ## 開發
 
@@ -362,6 +403,8 @@ bun run typecheck
 | `MAX_TOKENS_PER_DAY` | 每日 token 限制 | `1000000` |
 | `BROWSER_HEADLESS` | 以 headless 模式執行瀏覽器 | `true` |
 | `BROWSER_TIMEOUT` | 瀏覽器操作逾時時間 (毫秒) | `30000` |
+| `MAX_FILE_SIZE` | 最大檔案讀取/複製大小 (位元組) | `10485760` (10MB) |
+| `MAX_CONTENT_SIZE` | 最大寫入/附加內容大小 (位元組) | `5242880` (5MB) |
 
 ## 架構
 
